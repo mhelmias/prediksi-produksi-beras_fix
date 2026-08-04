@@ -24,6 +24,13 @@ from supabase_store import SupabaseStore
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 
+# Same-year regression:
+# prediktor tahun 2025 digunakan untuk memprediksi produksi tahun 2025.
+DEFAULT_PREDICTION_YEAR = 2025
+MIN_PREDICTION_YEAR = 2025
+MAX_PREDICTION_YEAR = 2100
+HISTORICAL_SEED_END_YEAR = 2024
+
 st.set_page_config(
     page_title="Prediksi Produksi Beras",
     page_icon="🌾",
@@ -186,8 +193,9 @@ def validate_admin_frame(
 def dashboard_page() -> None:
     st.title("🌾 Prediksi Produksi Beras")
     st.caption(
-        "XGBoost kabupaten/kota dan hierarchical forecasting "
-        "Bottom-Up hingga tingkat provinsi."
+        "XGBoost kabupaten/kota dengan same-year regression dan "
+        "hierarchical forecasting Bottom-Up hingga tingkat provinsi. "
+        "Prediktor tahun t digunakan untuk memprediksi produksi tahun t."
     )
 
     years = load_years()
@@ -379,8 +387,27 @@ def login_form() -> None:
 def seed_historical(
     store: SupabaseStore,
 ) -> None:
+    """Masukkan hasil historis hanya sampai 2024."""
     seed_path = DATA_DIR / "seed_predictions_2022_2025.csv"
     frame = pd.read_csv(seed_path)
+
+    if "year" not in frame.columns:
+        raise ValueError("File seed tidak memiliki kolom 'year'.")
+
+    frame["year"] = pd.to_numeric(
+        frame["year"],
+        errors="raise",
+    ).astype(int)
+    frame = frame.loc[
+        frame["year"] <= HISTORICAL_SEED_END_YEAR
+    ].copy()
+
+    if frame.empty:
+        raise ValueError(
+            "Tidak ada data seed historis sampai tahun "
+            f"{HISTORICAL_SEED_END_YEAR}."
+        )
+
     city = frame[
         [
             "year",
@@ -395,7 +422,10 @@ def seed_historical(
         batch_id=None,
         city_frame=city,
         province_frame=province,
-        source="hasil_model_2022_2025",
+        source=(
+            "hasil_model_2022_"
+            f"{HISTORICAL_SEED_END_YEAR}"
+        ),
     )
     clear_prediction_cache()
 
@@ -459,19 +489,33 @@ def admin_page() -> None:
             .to_dict(),
         )
 
-    if st.button("Masukkan hasil historis 2022–2025"):
+    if st.button(
+        f"Masukkan hasil historis 2022–{HISTORICAL_SEED_END_YEAR}"
+    ):
         try:
             seed_historical(store)
-            st.success("Data historis berhasil disimpan.")
+            st.success(
+                "Data historis 2022–"
+                f"{HISTORICAL_SEED_END_YEAR} berhasil disimpan. "
+                "Tahun 2025 tidak dimasukkan sebagai seed."
+            )
         except Exception as exc:
             st.error(f"Seed gagal: {exc}")
 
     year = st.number_input(
         "Tahun prediksi",
-        min_value=2026,
-        max_value=2100,
-        value=2026,
+        min_value=MIN_PREDICTION_YEAR,
+        max_value=MAX_PREDICTION_YEAR,
+        value=DEFAULT_PREDICTION_YEAR,
         step=1,
+        help=(
+            "Same-year regression: data prediktor tahun yang dipilih "
+            "digunakan untuk memprediksi produksi pada tahun yang sama."
+        ),
+    )
+    st.caption(
+        f"Data prediktor {int(year)} akan digunakan untuk memprediksi "
+        f"produksi beras tahun {int(year)}."
     )
 
     template = pd.read_csv(
@@ -505,8 +549,28 @@ def admin_page() -> None:
             runtime,
             regions,
         )
+
+        csv_years = sorted(
+            pd.to_numeric(
+                validated["tahun"],
+                errors="raise",
+            )
+            .astype(int)
+            .unique()
+            .tolist()
+        )
+        selected_year = int(year)
+
+        if csv_years != [selected_year]:
+            raise ValueError(
+                "Tahun pada CSV harus sama dengan tahun prediksi yang "
+                f"dipilih. Pilihan admin={selected_year}, "
+                f"tahun dalam CSV={csv_years}."
+            )
+
         st.success(
-            "Validasi awal berhasil: 119 wilayah lengkap."
+            "Validasi awal berhasil: 119 wilayah lengkap dan seluruh "
+            f"baris menggunakan prediktor tahun {selected_year}."
         )
     except Exception as exc:
         st.error(f"CSV belum valid: {exc}")
@@ -558,8 +622,12 @@ def admin_page() -> None:
             store.update_batch(batch_id, "completed")
             clear_prediction_cache()
 
+            prediction_year = int(
+                validated["tahun"].iloc[0]
+            )
             st.success(
-                "Prediksi 119 kabupaten/kota dan agregasi "
+                f"Prediksi produksi tahun {prediction_year} untuk "
+                "119 kabupaten/kota dan agregasi Bottom-Up menjadi "
                 "enam provinsi berhasil."
             )
             st.dataframe(
