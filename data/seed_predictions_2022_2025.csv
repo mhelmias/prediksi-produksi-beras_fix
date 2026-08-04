@@ -1,0 +1,477 @@
+year,province,city,actual_ton,prediction_ton,source
+2022,Banten,Kabupaten Lebak,430413.56,441367.546508663,hasil_model_kabkota
+2022,Banten,Kabupaten Pandeglang,553202.57,497548.4732952191,hasil_model_kabkota
+2022,Banten,Kabupaten Serang,446654.32,492040.5037645066,hasil_model_kabkota
+2022,Banten,Kabupaten Tangerang,289798.4,323762.696490132,hasil_model_kabkota
+2022,Banten,Kota Cilegon,9101.37,10443.74387389646,hasil_model_kabkota
+2022,Banten,Kota Serang,55987.47,63559.89375982902,hasil_model_kabkota
+2022,Banten,Kota Tangerang,3424.91,3876.800278957767,hasil_model_kabkota
+2022,Banten,Kota Tangerang Selatan,0.0,0.0,hasil_model_kabkota
+2022,DI Yogyakarta,Kabupaten Bantul,130339.44,118663.9002280119,hasil_model_kabkota
+2022,DI Yogyakarta,Kabupaten Gunungkidul,198309.83,204381.8027324545,hasil_model_kabkota
+2022,DI Yogyakarta,Kabupaten Kulon Progo,116055.76,96865.34664386377,hasil_model_kabkota
+2022,DI Yogyakarta,Kabupaten Sleman,116951.41,126284.4897884307,hasil_model_kabkota
+2022,DI Yogyakarta,Kota Yogyakarta,43.09,3.018831754676959,hasil_model_kabkota
+2022,DKI Jakarta,Kabupaten Administrasi Kepulauan Seribu,0.0,0.0,hasil_model_kabkota
+2022,DKI Jakarta,Kota Administrasi Jakarta Barat,181.21,202.3337155150135,hasil_model_kabkota
+2022,DKI Jakarta,Kota Administrasi Jakarta Pusat,0.0,6.903179876335469,hasil_model_kabkota
+2022,DKI Jakarta,Kota Administrasi Jakarta Selatan,0.0,0.0,hasil_model_kabkota
+2022,DKI Jakarta,Kota Administrasi Jakarta Timur,187.41,17.394027147695,hasil_model_kabkota
+2022,DKI Jakarta,Kota Administrasi Jakarta Utara,1969.15,4257.684609826272,hasil_model_kabkota
+2022,Jawa Barat,Kabupaten Bandung,289205.7,333926.0792181853,hasil_model_kabkota
+2022,Jawa Barat,Kabupaten Bandung Barat,153648.29,179923.6050572768,hasil_model_kabkota
+2022,Jawa Barat,Kabupaten Bekasi,555747.09,569764.5824267685,hasil_model_kabkota
+2022,Jawa Barat,Kabupaten Bogor,299893.8,285239.4197029502,hasil_model_kabkota
+2022,Jawa Barat,Kabupaten Ciamis,305676.17,323474.9745747835,hasil_model_kabkota
+2022,Jawa Barat,Kabupaten Cianjur,617941.03,669115.0254251133,hasil_model_kabkota
+2022,Jawa Barat,Kabupaten Cirebon,494699.98,485445.5162294475,hasil_model_kabkota
+2022,Jawa Barat,Kabupaten Garut,441316.2,451372.1446913829,hasil_model_kabkota
+2022,Jawa Barat,Kabupaten Indramayu,1482255.86,1383970.697226915,hasil_model_kabkota
+2022,Jawa Barat,Kabupaten Karawang,1226880.08,1166670.152877484,hasil_model_kabkota
+2022,Jawa Barat,Kabupaten Kuningan,277583.76,279268.1374385759,hasil_model_kabkota
+2022,Jawa Barat,Kabupaten Majalengka,566087.34,583943.2389672484,hasil_model_kabkota
+2022,Jawa Barat,Kabupaten Pangandaran,148670.61,139244.1734680777,hasil_model_kabkota
+2022,Jawa Barat,Kabupaten Purwakarta,188731.69,180223.7788418579,hasil_model_kabkota
+2022,Jawa Barat,Kabupaten Subang,1038780.58,1008827.422284854,hasil_model_kabkota
+2022,Jawa Barat,Kabupaten Sukabumi,508220.48,511862.345137137,hasil_model_kabkota
+2022,Jawa Barat,Kabupaten Sumedang,298163.0,301113.7724985208,hasil_model_kabkota
+2022,Jawa Barat,Kabupaten Tasikmalaya,430961.73,447405.6589774351,hasil_model_kabkota
+2022,Jawa Barat,Kota Bandung,7186.11,2107.135250786945,hasil_model_kabkota
+2022,Jawa Barat,Kota Banjar,31271.18,22169.81582966169,hasil_model_kabkota
+2022,Jawa Barat,Kota Bekasi,1868.44,1094.298525945,hasil_model_kabkota
+2022,Jawa Barat,Kota Bogor,173.99,3.200144404620346,hasil_model_kabkota
+2022,Jawa Barat,Kota Cimahi,338.03,44.88287470096649,hasil_model_kabkota
+2022,Jawa Barat,Kota Cirebon,861.82,407.9069045733073,hasil_model_kabkota
+2022,Jawa Barat,Kota Depok,72.13,0.0,hasil_model_kabkota
+2022,Jawa Barat,Kota Sukabumi,13254.34,5722.508452501021,hasil_model_kabkota
+2022,Jawa Barat,Kota Tasikmalaya,54233.66,35338.40614831682,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Banjarnegara,109047.94,114305.2228315611,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Banyumas,275622.59,284501.8270070982,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Batang,130915.33,126095.3302228547,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Blora,481758.33,532374.9679784622,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Boyolali,293909.04,288367.3979998481,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Brebes,442225.87,432562.7008003289,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Cilacap,761355.92,748148.4010621661,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Demak,615685.96,622324.280417644,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Grobogan,778895.15,800588.5864574243,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Jepara,203279.05,195053.4122709321,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Karanganyar,268582.78,232525.078524775,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Kebumen,424840.1,405076.9421629185,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Kendal,161073.29,146675.7104390401,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Klaten,338083.63,349878.4281524416,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Kudus,195692.08,180442.7093973721,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Magelang,169112.19,155471.7394458362,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Pati,587469.44,638830.4716585475,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Pekalongan,164951.88,181648.4390591859,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Pemalang,390777.57,406752.6828911924,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Purbalingga,154076.91,157545.0527303089,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Purworejo,279100.57,266056.9156082014,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Rembang,179211.77,162715.9799584394,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Semarang,137763.91,150128.3925937258,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Sragen,626632.73,726988.5788827249,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Sukoharjo,308529.08,323631.0365205093,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Tegal,341113.01,352485.1623757873,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Temanggung,56887.24,50832.74748098821,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Wonogiri,383143.3,386860.4177445796,hasil_model_kabkota
+2022,Jawa Tengah,Kabupaten Wonosobo,66996.75,60526.9994046329,hasil_model_kabkota
+2022,Jawa Tengah,Kota Magelang,725.68,529.2799508432852,hasil_model_kabkota
+2022,Jawa Tengah,Kota Pekalongan,7052.69,7748.729126094519,hasil_model_kabkota
+2022,Jawa Tengah,Kota Salatiga,3382.08,3636.645251343136,hasil_model_kabkota
+2022,Jawa Tengah,Kota Semarang,15201.27,13722.32980645853,hasil_model_kabkota
+2022,Jawa Tengah,Kota Surakarta,135.08,197.2140477664581,hasil_model_kabkota
+2022,Jawa Tengah,Kota Tegal,3215.0,3822.046230682226,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Bangkalan,198122.71,186895.6510101135,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Banyuwangi,462205.98,424952.1752914366,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Blitar,215482.79,185190.4341314533,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Bojonegoro,704288.94,735568.9726303308,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Bondowoso,238677.65,275896.6760266873,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Gresik,411242.2,358097.1887638991,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Jember,607371.19,642599.7271464848,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Jombang,337172.14,299325.6594516916,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Kediri,168853.55,152546.7962749911,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Lamongan,903882.29,902905.4679452394,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Lumajang,300829.01,282699.541000596,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Madiun,401573.69,423997.3443997297,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Magetan,266699.89,259531.4350658661,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Malang,271606.78,271632.0875727817,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Mojokerto,281829.41,287788.3043279935,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Nganjuk,376476.43,387880.7481075465,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Ngawi,755938.95,749290.38924004,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Pacitan,90428.21,71432.1886841414,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Pamekasan,107648.71,114828.9470220526,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Pasuruan,247255.72,278242.2964073595,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Ponorogo,359413.77,343967.9444156623,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Probolinggo,185412.51,157168.4700211277,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Sampang,172494.38,180760.5403697573,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Sidoarjo,194540.45,163954.4741343851,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Situbondo,141628.0,145497.6606564607,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Sumenep,230581.31,202089.5311803011,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Trenggalek,115758.01,99592.94816478244,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Tuban,498938.59,464534.5194319042,hasil_model_kabkota
+2022,Jawa Timur,Kabupaten Tulungagung,207217.26,204179.6084800927,hasil_model_kabkota
+2022,Jawa Timur,Kota Batu,6762.89999999851,33086.2975830769,hasil_model_kabkota
+2022,Jawa Timur,Kota Blitar,5212.13,4097.176486352709,hasil_model_kabkota
+2022,Jawa Timur,Kota Kediri,10197.5,9173.297509208556,hasil_model_kabkota
+2022,Jawa Timur,Kota Madiun,11453.92,10845.17773406999,hasil_model_kabkota
+2022,Jawa Timur,Kota Malang,10771.15,5355.956373495749,hasil_model_kabkota
+2022,Jawa Timur,Kota Mojokerto,5032.96,4396.277112446694,hasil_model_kabkota
+2022,Jawa Timur,Kota Pasuruan,7293.69,6719.469642331678,hasil_model_kabkota
+2022,Jawa Timur,Kota Probolinggo,8103.92,6272.555275893765,hasil_model_kabkota
+2022,Jawa Timur,Kota Surabaya,8117.31,8436.141237671312,hasil_model_kabkota
+2023,Banten,Kabupaten Lebak,396558.51,376152.8042362108,hasil_model_kabkota
+2023,Banten,Kabupaten Pandeglang,481001.54,457094.8039004023,hasil_model_kabkota
+2023,Banten,Kabupaten Serang,449067.08,386501.8245918617,hasil_model_kabkota
+2023,Banten,Kabupaten Tangerang,290083.09,279968.2259266555,hasil_model_kabkota
+2023,Banten,Kota Cilegon,8982.9,9036.202685704051,hasil_model_kabkota
+2023,Banten,Kota Serang,57527.32,60430.1391479557,hasil_model_kabkota
+2023,Banten,Kota Tangerang,3262.85,3281.719545996408,hasil_model_kabkota
+2023,Banten,Kota Tangerang Selatan,0.0,3.600310793103213,hasil_model_kabkota
+2023,DI Yogyakarta,Kabupaten Bantul,123289.21,138371.0202509676,hasil_model_kabkota
+2023,DI Yogyakarta,Kabupaten Gunungkidul,191255.42,201634.9638801993,hasil_model_kabkota
+2023,DI Yogyakarta,Kabupaten Kulon Progo,103940.48,104850.7072923324,hasil_model_kabkota
+2023,DI Yogyakarta,Kabupaten Sleman,115592.5,134908.8529402361,hasil_model_kabkota
+2023,DI Yogyakarta,Kota Yogyakarta,36.08,47.73174570964215,hasil_model_kabkota
+2023,DKI Jakarta,Kabupaten Administrasi Kepulauan Seribu,0.0,1.327813569779174,hasil_model_kabkota
+2023,DKI Jakarta,Kota Administrasi Jakarta Barat,184.35,174.6275112421947,hasil_model_kabkota
+2023,DKI Jakarta,Kota Administrasi Jakarta Pusat,0.0,3.42991581310145,hasil_model_kabkota
+2023,DKI Jakarta,Kota Administrasi Jakarta Selatan,0.0,2.56898516244528,hasil_model_kabkota
+2023,DKI Jakarta,Kota Administrasi Jakarta Timur,251.17,278.0835356602519,hasil_model_kabkota
+2023,DKI Jakarta,Kota Administrasi Jakarta Utara,2238.76,3808.370543091352,hasil_model_kabkota
+2023,Jawa Barat,Kabupaten Bandung,300142.89,290449.8184014758,hasil_model_kabkota
+2023,Jawa Barat,Kabupaten Bandung Barat,143212.52,146237.8043830182,hasil_model_kabkota
+2023,Jawa Barat,Kabupaten Bekasi,497339.49,471985.4233998359,hasil_model_kabkota
+2023,Jawa Barat,Kabupaten Bogor,283266.58,270140.8998625127,hasil_model_kabkota
+2023,Jawa Barat,Kabupaten Ciamis,299124.49,290101.3424012384,hasil_model_kabkota
+2023,Jawa Barat,Kabupaten Cianjur,650123.11,649900.0600845623,hasil_model_kabkota
+2023,Jawa Barat,Kabupaten Cirebon,495878.2,451954.4977647341,hasil_model_kabkota
+2023,Jawa Barat,Kabupaten Garut,453787.94,438000.4504187565,hasil_model_kabkota
+2023,Jawa Barat,Kabupaten Indramayu,1424303.1,1356213.808310133,hasil_model_kabkota
+2023,Jawa Barat,Kabupaten Karawang,1131976.57,1110306.263643785,hasil_model_kabkota
+2023,Jawa Barat,Kabupaten Kuningan,261023.34,265881.6851090485,hasil_model_kabkota
+2023,Jawa Barat,Kabupaten Majalengka,558430.27,570115.8644527358,hasil_model_kabkota
+2023,Jawa Barat,Kabupaten Pangandaran,139300.3,166548.4485126361,hasil_model_kabkota
+2023,Jawa Barat,Kabupaten Purwakarta,186533.23,184028.8128175456,hasil_model_kabkota
+2023,Jawa Barat,Kabupaten Subang,1027659.54,1020673.351237651,hasil_model_kabkota
+2023,Jawa Barat,Kabupaten Sukabumi,512391.58,485624.8996219274,hasil_model_kabkota
+2023,Jawa Barat,Kabupaten Sumedang,287112.51,294048.2996856465,hasil_model_kabkota
+2023,Jawa Barat,Kabupaten Tasikmalaya,391379.69,403517.2231827097,hasil_model_kabkota
+2023,Jawa Barat,Kota Bandung,6325.63,5167.039101097525,hasil_model_kabkota
+2023,Jawa Barat,Kota Banjar,31891.8,29577.57097158352,hasil_model_kabkota
+2023,Jawa Barat,Kota Bekasi,1316.49,1262.07161428785,hasil_model_kabkota
+2023,Jawa Barat,Kota Bogor,123.61,86.15309836084602,hasil_model_kabkota
+2023,Jawa Barat,Kota Cimahi,440.48,419.3692197325582,hasil_model_kabkota
+2023,Jawa Barat,Kota Cirebon,769.39,652.6666571798113,hasil_model_kabkota
+2023,Jawa Barat,Kota Depok,30.51,0.0,hasil_model_kabkota
+2023,Jawa Barat,Kota Sukabumi,16187.08,11071.7627618171,hasil_model_kabkota
+2023,Jawa Barat,Kota Tasikmalaya,39968.81,43866.11408863912,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Banjarnegara,96637.48,106169.9870828682,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Banyumas,280224.38,289137.0158890049,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Batang,146349.82,149356.9200625053,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Blora,472868.55,529904.4122223071,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Boyolali,277037.84,281382.0332005561,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Brebes,424362.51,417614.5424900135,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Cilacap,772488.96,791029.4426972095,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Demak,564962.11,549668.2604748833,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Grobogan,678350.41,773784.3696427309,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Jepara,187316.85,206371.4951297143,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Karanganyar,266578.42,209689.113326982,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Kebumen,404317.61,415626.1053441663,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Kendal,158931.43,168214.1835996149,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Klaten,353911.22,366097.8369468492,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Kudus,162001.48,182995.8902565655,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Magelang,160694.62,169126.7937352281,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Pati,508149.97,492574.7451047972,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Pekalongan,169539.43,216618.9045666551,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Pemalang,384838.98,422800.7133557497,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Purbalingga,140160.87,151205.6672224433,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Purworejo,287721.45,279666.6200285985,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Rembang,215629.01,202136.3125087342,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Semarang,143193.67,157882.2290005705,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Sragen,641988.28,668144.8583151181,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Sukoharjo,348736.08,303399.2257870469,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Tegal,322355.32,338879.5259079507,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Temanggung,46499.41,62494.1897042898,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Wonogiri,376431.03,381630.9181249941,hasil_model_kabkota
+2023,Jawa Tengah,Kabupaten Wonosobo,60651.87,72634.62597835714,hasil_model_kabkota
+2023,Jawa Tengah,Kota Magelang,646.43,1178.510058391157,hasil_model_kabkota
+2023,Jawa Tengah,Kota Pekalongan,7766.8,11166.98152459913,hasil_model_kabkota
+2023,Jawa Tengah,Kota Salatiga,3501.04,3809.4722108391,hasil_model_kabkota
+2023,Jawa Tengah,Kota Semarang,15925.58,12477.52747076888,hasil_model_kabkota
+2023,Jawa Tengah,Kota Surakarta,157.57,222.9337845086937,hasil_model_kabkota
+2023,Jawa Tengah,Kota Tegal,3181.0,4639.171332754882,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Bangkalan,186257.96,198887.0203713723,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Banyuwangi,454768.46,432547.7740195884,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Blitar,240224.41,196216.9759920507,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Bojonegoro,705962.63,719010.115603229,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Bondowoso,247778.74,267086.1181224459,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Gresik,417428.58,405749.9966683351,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Jember,616725.77,677715.200666119,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Jombang,346873.45,341655.3596300036,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Kediri,183533.76,171359.0637287497,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Lamongan,798704.85,780787.7324433074,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Lumajang,308646.08,289359.6420551055,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Madiun,437593.08,441133.0587827615,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Magetan,280592.09,276255.5312996649,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Malang,279365.91,255215.9855700552,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Mojokerto,302890.75,307507.9684957408,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Nganjuk,418096.11,414214.7717636581,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Ngawi,771251.37,741607.8802253522,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Pacitan,92992.64,80030.66786378677,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Pamekasan,108483.14,99565.52496800374,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Pasuruan,260061.94,286309.9990843156,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Ponorogo,392994.08,387636.9502673709,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Probolinggo,201044.34,173061.910805646,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Sampang,167191.35,161094.0019751784,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Sidoarjo,195855.35,190125.3701969057,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Situbondo,157273.25,159228.2615121792,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Sumenep,217810.48,204239.5246080993,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Trenggalek,114874.53,114054.9303614895,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Tuban,501741.12,469265.297864812,hasil_model_kabkota
+2023,Jawa Timur,Kabupaten Tulungagung,235502.11,213748.4198964954,hasil_model_kabkota
+2023,Jawa Timur,Kota Batu,4862.81,3947.382542618899,hasil_model_kabkota
+2023,Jawa Timur,Kota Blitar,5636.68,5098.410203206477,hasil_model_kabkota
+2023,Jawa Timur,Kota Kediri,8271.57,7665.468612142366,hasil_model_kabkota
+2023,Jawa Timur,Kota Madiun,12169.62,8351.241360047527,hasil_model_kabkota
+2023,Jawa Timur,Kota Malang,10318.57,9279.171621570269,hasil_model_kabkota
+2023,Jawa Timur,Kota Mojokerto,3292.78,2751.877986610767,hasil_model_kabkota
+2023,Jawa Timur,Kota Pasuruan,8020.03,7648.162074640467,hasil_model_kabkota
+2023,Jawa Timur,Kota Probolinggo,7502.06,6470.349130122032,hasil_model_kabkota
+2023,Jawa Timur,Kota Surabaya,8068.88,8110.385028433178,hasil_model_kabkota
+2024,Banten,Kabupaten Lebak,357013.22,386851.7120108797,hasil_model_kabkota
+2024,Banten,Kabupaten Pandeglang,414576.37,399408.733582912,hasil_model_kabkota
+2024,Banten,Kabupaten Serang,409149.71,367264.5336531702,hasil_model_kabkota
+2024,Banten,Kabupaten Tangerang,298677.72,301408.0407441616,hasil_model_kabkota
+2024,Banten,Kota Cilegon,9599.79,10923.36724711266,hasil_model_kabkota
+2024,Banten,Kota Serang,58898.59,57691.44094728622,hasil_model_kabkota
+2024,Banten,Kota Tangerang,2708.06,2902.081570959058,hasil_model_kabkota
+2024,Banten,Kota Tangerang Selatan,0.0,3.785134803085,hasil_model_kabkota
+2024,DI Yogyakarta,Kabupaten Bantul,114798.27,130236.0985162183,hasil_model_kabkota
+2024,DI Yogyakarta,Kabupaten Gunungkidul,140150.59,202499.2958945905,hasil_model_kabkota
+2024,DI Yogyakarta,Kabupaten Kulon Progo,91842.01,101921.503727152,hasil_model_kabkota
+2024,DI Yogyakarta,Kabupaten Sleman,105982.61,127261.3828607963,hasil_model_kabkota
+2024,DI Yogyakarta,Kota Yogyakarta,58.29,51.37534838990294,hasil_model_kabkota
+2024,DKI Jakarta,Kabupaten Administrasi Kepulauan Seribu,0.0,0.5869606373743672,hasil_model_kabkota
+2024,DKI Jakarta,Kota Administrasi Jakarta Barat,140.75,102.848871588475,hasil_model_kabkota
+2024,DKI Jakarta,Kota Administrasi Jakarta Pusat,0.0,0.0,hasil_model_kabkota
+2024,DKI Jakarta,Kota Administrasi Jakarta Selatan,0.0,2.56630682762785,hasil_model_kabkota
+2024,DKI Jakarta,Kota Administrasi Jakarta Timur,158.68,137.0741975617214,hasil_model_kabkota
+2024,DKI Jakarta,Kota Administrasi Jakarta Utara,2007.11,3228.471593892531,hasil_model_kabkota
+2024,Jawa Barat,Kabupaten Bandung,334188.58,301737.1105679304,hasil_model_kabkota
+2024,Jawa Barat,Kabupaten Bandung Barat,148802.98,159185.701354704,hasil_model_kabkota
+2024,Jawa Barat,Kabupaten Bekasi,416476.98,433665.9542854129,hasil_model_kabkota
+2024,Jawa Barat,Kabupaten Bogor,299675.82,267360.9954845636,hasil_model_kabkota
+2024,Jawa Barat,Kabupaten Ciamis,236248.23,246026.2906849978,hasil_model_kabkota
+2024,Jawa Barat,Kabupaten Cianjur,630847.78,625684.2121992642,hasil_model_kabkota
+2024,Jawa Barat,Kabupaten Cirebon,510632.02,461470.3725093228,hasil_model_kabkota
+2024,Jawa Barat,Kabupaten Garut,454937.51,438845.2324703553,hasil_model_kabkota
+2024,Jawa Barat,Kabupaten Indramayu,1399352.12,1351195.671438254,hasil_model_kabkota
+2024,Jawa Barat,Kabupaten Karawang,1041530.95,1122222.817396931,hasil_model_kabkota
+2024,Jawa Barat,Kabupaten Kuningan,223427.76,204447.2248409643,hasil_model_kabkota
+2024,Jawa Barat,Kabupaten Majalengka,484085.66,482329.7158159972,hasil_model_kabkota
+2024,Jawa Barat,Kabupaten Pangandaran,118188.45,131500.3518778176,hasil_model_kabkota
+2024,Jawa Barat,Kabupaten Purwakarta,180397.1,166149.1626148889,hasil_model_kabkota
+2024,Jawa Barat,Kabupaten Subang,968941.45,1022705.247108275,hasil_model_kabkota
+2024,Jawa Barat,Kabupaten Sukabumi,466835.93,421347.6606974629,hasil_model_kabkota
+2024,Jawa Barat,Kabupaten Sumedang,271869.0,292264.7218964052,hasil_model_kabkota
+2024,Jawa Barat,Kabupaten Tasikmalaya,353415.07,373111.1184646055,hasil_model_kabkota
+2024,Jawa Barat,Kota Bandung,6547.7,5308.523128281594,hasil_model_kabkota
+2024,Jawa Barat,Kota Banjar,28913.8,18797.76107529518,hasil_model_kabkota
+2024,Jawa Barat,Kota Bekasi,1211.69,1196.493159273246,hasil_model_kabkota
+2024,Jawa Barat,Kota Bogor,150.39,81.4806430279852,hasil_model_kabkota
+2024,Jawa Barat,Kota Cimahi,435.34,448.046755821344,hasil_model_kabkota
+2024,Jawa Barat,Kota Cirebon,638.23,631.545935615327,hasil_model_kabkota
+2024,Jawa Barat,Kota Depok,32.73,7.008824071902309,hasil_model_kabkota
+2024,Jawa Barat,Kota Sukabumi,13693.1,11718.62729276386,hasil_model_kabkota
+2024,Jawa Barat,Kota Tasikmalaya,35403.54,27839.53804161272,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Banjarnegara,103082.48,102006.2288679559,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Banyumas,238181.19,254495.7518743264,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Batang,139924.97,141230.2264660726,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Blora,424410.81,434281.1510862139,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Boyolali,279953.51,285431.6806723668,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Brebes,419117.47,403869.1940392362,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Cilacap,651135.71,670357.8117302824,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Demak,595405.86,591984.9439337893,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Grobogan,735187.08,746235.6187869154,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Jepara,202255.93,200099.9487163936,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Karanganyar,259568.75,209830.6142260745,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Kebumen,374547.12,398595.8749986241,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Kendal,175081.41,168744.4661690254,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Klaten,304870.91,292842.7326015292,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Kudus,177192.04,178042.9992273559,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Magelang,151779.3,165055.8487021396,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Pati,527355.2,537859.7046261355,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Pekalongan,205076.95,197556.5263336461,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Pemalang,421329.41,402097.2029217868,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Purbalingga,138435.98,145961.9944675426,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Purworejo,279478.0,272339.7332189411,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Rembang,137256.42,150191.9326168234,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Semarang,154736.31,152977.4813373878,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Sragen,732281.33,752202.0083206638,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Sukoharjo,319661.43,268720.5519396688,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Tegal,312720.22,320047.2122690425,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Temanggung,50813.53,58660.19416151816,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Wonogiri,289707.98,286340.8299376507,hasil_model_kabkota
+2024,Jawa Tengah,Kabupaten Wonosobo,59488.44,68191.79652115027,hasil_model_kabkota
+2024,Jawa Tengah,Kota Magelang,528.77,1007.098353685442,hasil_model_kabkota
+2024,Jawa Tengah,Kota Pekalongan,8803.8,7651.027024124658,hasil_model_kabkota
+2024,Jawa Tengah,Kota Salatiga,4012.62,3533.848573067689,hasil_model_kabkota
+2024,Jawa Tengah,Kota Semarang,14209.65,13198.59829956279,hasil_model_kabkota
+2024,Jawa Tengah,Kota Surakarta,163.78,219.709205846628,hasil_model_kabkota
+2024,Jawa Tengah,Kota Tegal,3542.6,3854.513118604329,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Bangkalan,189161.9,211213.2864239408,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Banyuwangi,395631.38,404944.4613107546,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Blitar,171154.02,170905.2760171862,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Bojonegoro,710527.18,720186.3876291178,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Bondowoso,259477.68,275129.6771364688,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Gresik,328959.53,306483.1106300949,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Jember,623264.88,674953.6178766922,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Jombang,342291.32,312596.9326692655,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Kediri,174072.2,169238.8697727675,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Lamongan,776290.66,784563.2049478221,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Lumajang,257120.65,285010.4446744458,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Madiun,437458.25,434980.2542166852,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Magetan,272246.05,274909.4385992395,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Malang,254793.72,213639.5272245035,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Mojokerto,285714.44,286465.4447665458,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Nganjuk,404975.09,396424.9851423944,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Ngawi,765703.53,730941.4750386195,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Pacitan,69650.98,63994.65644723233,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Pamekasan,101501.42,111903.6648225607,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Pasuruan,277354.51,299908.1909499633,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Ponorogo,379244.91,360011.4611876603,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Probolinggo,177607.38,177204.2432802931,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Sampang,145931.75,177895.8667907654,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Sidoarjo,208986.7,215781.2208806286,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Situbondo,162236.82,167381.5105125937,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Sumenep,189499.69,207268.8864518161,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Trenggalek,104859.35,69697.82369772287,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Tuban,523067.49,471820.224107349,hasil_model_kabkota
+2024,Jawa Timur,Kabupaten Tulungagung,214820.77,195863.2456269196,hasil_model_kabkota
+2024,Jawa Timur,Kota Batu,3659.41,3769.098048446465,hasil_model_kabkota
+2024,Jawa Timur,Kota Blitar,3722.17,4210.871094966028,hasil_model_kabkota
+2024,Jawa Timur,Kota Kediri,8392.91,8003.944777740548,hasil_model_kabkota
+2024,Jawa Timur,Kota Madiun,12610.42,7997.833655092727,hasil_model_kabkota
+2024,Jawa Timur,Kota Malang,10496.65,8974.708777232101,hasil_model_kabkota
+2024,Jawa Timur,Kota Mojokerto,3449.63,2863.134877542527,hasil_model_kabkota
+2024,Jawa Timur,Kota Pasuruan,8665.29,8441.450068597956,hasil_model_kabkota
+2024,Jawa Timur,Kota Probolinggo,8494.14,7033.723005276345,hasil_model_kabkota
+2024,Jawa Timur,Kota Surabaya,7340.42,7567.038712305566,hasil_model_kabkota
+2025,Banten,Kabupaten Lebak,422943.0,480812.3362930029,hasil_model_kabkota
+2025,Banten,Kabupaten Pandeglang,552983.0,563004.1348498281,hasil_model_kabkota
+2025,Banten,Kabupaten Serang,419792.0,389005.0017921625,hasil_model_kabkota
+2025,Banten,Kabupaten Tangerang,307816.0,315074.2278281386,hasil_model_kabkota
+2025,Banten,Kota Cilegon,8413.0,11578.15030162305,hasil_model_kabkota
+2025,Banten,Kota Serang,61045.0,66759.48038509022,hasil_model_kabkota
+2025,Banten,Kota Tangerang,1025.0,719.2173778590782,hasil_model_kabkota
+2025,Banten,Kota Tangerang Selatan,0.0,4.501631066992045,hasil_model_kabkota
+2025,DI Yogyakarta,Kabupaten Bantul,125104.0,130678.0745466755,hasil_model_kabkota
+2025,DI Yogyakarta,Kabupaten Gunungkidul,203756.0,229722.7949111449,hasil_model_kabkota
+2025,DI Yogyakarta,Kabupaten Kulon Progo,106269.0,98414.94067947158,hasil_model_kabkota
+2025,DI Yogyakarta,Kabupaten Sleman,112293.0,119964.5938419545,hasil_model_kabkota
+2025,DI Yogyakarta,Kota Yogyakarta,88.0,153.9586212440492,hasil_model_kabkota
+2025,DKI Jakarta,Kabupaten Administrasi Kepulauan Seribu,316.3775830175634,7.783278109609855,hasil_model_kabkota
+2025,DKI Jakarta,Kota Administrasi Jakarta Barat,300.0,297.3281495197244,hasil_model_kabkota
+2025,DKI Jakarta,Kota Administrasi Jakarta Pusat,473.6985274711461,56.02653923900811,hasil_model_kabkota
+2025,DKI Jakarta,Kota Administrasi Jakarta Selatan,28.46388951129042,5.799010744872014,hasil_model_kabkota
+2025,DKI Jakarta,Kota Administrasi Jakarta Timur,137.0,102.9953204505256,hasil_model_kabkota
+2025,DKI Jakarta,Kota Administrasi Jakarta Utara,1051.0,1219.284387964389,hasil_model_kabkota
+2025,Jawa Barat,Kabupaten Bandung,353307.0,366517.6813773301,hasil_model_kabkota
+2025,Jawa Barat,Kabupaten Bandung Barat,215065.0,242558.2904389529,hasil_model_kabkota
+2025,Jawa Barat,Kabupaten Bekasi,500189.0,467794.2567269454,hasil_model_kabkota
+2025,Jawa Barat,Kabupaten Bogor,345984.0,314896.5478841895,hasil_model_kabkota
+2025,Jawa Barat,Kabupaten Ciamis,331255.0,365647.1732329201,hasil_model_kabkota
+2025,Jawa Barat,Kabupaten Cianjur,800735.0,753691.3733733692,hasil_model_kabkota
+2025,Jawa Barat,Kabupaten Cirebon,568548.0,499486.0984552751,hasil_model_kabkota
+2025,Jawa Barat,Kabupaten Garut,555727.0,619893.8297681799,hasil_model_kabkota
+2025,Jawa Barat,Kabupaten Indramayu,1583262.0,1364325.713398715,hasil_model_kabkota
+2025,Jawa Barat,Kabupaten Karawang,1194712.0,1127235.42275545,hasil_model_kabkota
+2025,Jawa Barat,Kabupaten Kuningan,249686.0,296644.0254850715,hasil_model_kabkota
+2025,Jawa Barat,Kabupaten Majalengka,496250.0,490893.2914442648,hasil_model_kabkota
+2025,Jawa Barat,Kabupaten Pangandaran,160944.0,142620.7882878393,hasil_model_kabkota
+2025,Jawa Barat,Kabupaten Purwakarta,188774.0,197136.3969059025,hasil_model_kabkota
+2025,Jawa Barat,Kabupaten Subang,1094781.0,1003641.612553653,hasil_model_kabkota
+2025,Jawa Barat,Kabupaten Sukabumi,660107.0,718537.6513309549,hasil_model_kabkota
+2025,Jawa Barat,Kabupaten Sumedang,294027.0,292461.5081928895,hasil_model_kabkota
+2025,Jawa Barat,Kabupaten Tasikmalaya,524895.0,611054.1230192707,hasil_model_kabkota
+2025,Jawa Barat,Kota Bandung,6978.0,4124.123004416025,hasil_model_kabkota
+2025,Jawa Barat,Kota Banjar,31808.0,21159.48688603887,hasil_model_kabkota
+2025,Jawa Barat,Kota Bekasi,897.0,855.6097131812189,hasil_model_kabkota
+2025,Jawa Barat,Kota Bogor,805.0,612.686571740018,hasil_model_kabkota
+2025,Jawa Barat,Kota Cimahi,575.0,641.0214082066093,hasil_model_kabkota
+2025,Jawa Barat,Kota Cirebon,676.0,480.5968379516338,hasil_model_kabkota
+2025,Jawa Barat,Kota Depok,52.0,15.59090562327993,hasil_model_kabkota
+2025,Jawa Barat,Kota Sukabumi,15835.0,11064.63237783346,hasil_model_kabkota
+2025,Jawa Barat,Kota Tasikmalaya,50779.0,44881.04376362538,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Banjarnegara,98177.0,100812.7872921594,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Banyumas,278014.0,281645.449072275,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Batang,120335.0,137733.7203212263,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Blora,526724.0,601076.4679902943,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Boyolali,245267.0,249773.1422873723,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Brebes,453077.0,501710.3807959775,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Cilacap,758569.0,774084.5219391057,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Demak,634373.0,641460.5756867023,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Grobogan,724004.0,739997.6419906254,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Jepara,214441.0,213494.8677570581,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Karanganyar,259006.0,235813.2308113714,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Kebumen,412353.0,404009.3806794921,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Kendal,170759.0,158442.1685048728,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Klaten,329137.0,330895.5856036426,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Kudus,174914.0,188986.8538137007,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Magelang,164523.0,178736.9075101158,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Pati,604967.0,640597.4073980466,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Pekalongan,177242.0,176205.6293560388,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Pemalang,373677.0,393765.6361336455,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Purbalingga,142111.0,144836.3507546544,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Purworejo,310539.0,274523.6563276265,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Rembang,176533.0,177588.8286886411,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Semarang,159547.0,159377.4507247409,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Sragen,690388.0,619446.8696905056,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Sukoharjo,290643.0,299845.9619892201,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Tegal,309316.0,319051.5728041517,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Temanggung,55050.0,56219.58631301083,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Wonogiri,359542.0,388375.7124073779,hasil_model_kabkota
+2025,Jawa Tengah,Kabupaten Wonosobo,61519.0,66887.69510025182,hasil_model_kabkota
+2025,Jawa Tengah,Kota Magelang,491.0,753.3015761334594,hasil_model_kabkota
+2025,Jawa Tengah,Kota Pekalongan,7750.0,7692.730747170164,hasil_model_kabkota
+2025,Jawa Tengah,Kota Salatiga,4257.0,3793.165051981816,hasil_model_kabkota
+2025,Jawa Tengah,Kota Semarang,14996.0,13389.505228996,hasil_model_kabkota
+2025,Jawa Tengah,Kota Surakarta,248.0,186.2806718382857,hasil_model_kabkota
+2025,Jawa Tengah,Kota Tegal,1576.0,2592.887247116339,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Bangkalan,223789.0,246763.1907174617,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Banyuwangi,453636.0,424652.1998501276,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Blitar,231437.0,205978.7545422238,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Bojonegoro,879685.0,867080.7691382993,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Bondowoso,278822.0,273946.1695624566,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Gresik,375591.0,353252.4330998879,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Jember,679514.0,733581.178591775,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Jombang,441642.0,407988.3636061199,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Kediri,198324.0,188026.7920798429,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Lamongan,879994.0,903639.4252310626,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Lumajang,279902.0,279951.0673357118,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Madiun,480264.0,481554.2562135538,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Magetan,308221.0,303119.5061722666,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Malang,246370.0,217464.1552778649,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Mojokerto,312409.0,299238.0350922307,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Nganjuk,435224.0,423944.1376507617,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Ngawi,772571.0,797313.8855200581,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Pacitan,132516.0,130204.9663099244,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Pamekasan,131369.0,134424.6203528509,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Pasuruan,274285.0,276286.0993260758,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Ponorogo,436300.0,413551.5214207851,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Probolinggo,196116.0,194790.0502382331,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Sampang,189903.0,204049.7989350736,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Sidoarjo,175677.0,175895.2275069757,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Situbondo,199165.0,201556.7630834616,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Sumenep,189423.0,196840.093794365,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Trenggalek,158029.0,164416.6057021386,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Tuban,577964.0,543248.81388642,hasil_model_kabkota
+2025,Jawa Timur,Kabupaten Tulungagung,240566.0,214225.3749374515,hasil_model_kabkota
+2025,Jawa Timur,Kota Batu,3025.0,3891.493973925948,hasil_model_kabkota
+2025,Jawa Timur,Kota Blitar,6068.0,5399.366740980598,hasil_model_kabkota
+2025,Jawa Timur,Kota Kediri,3709.0,4596.562385188718,hasil_model_kabkota
+2025,Jawa Timur,Kota Madiun,11889.0,12953.45669528388,hasil_model_kabkota
+2025,Jawa Timur,Kota Malang,8243.0,8617.74998395423,hasil_model_kabkota
+2025,Jawa Timur,Kota Mojokerto,3086.0,2836.028515985683,hasil_model_kabkota
+2025,Jawa Timur,Kota Pasuruan,7468.0,8131.486455194806,hasil_model_kabkota
+2025,Jawa Timur,Kota Probolinggo,10092.0,8224.466555586325,hasil_model_kabkota
+2025,Jawa Timur,Kota Surabaya,6075.0,7452.018410450844,hasil_model_kabkota
