@@ -31,6 +31,10 @@ MIN_PREDICTION_YEAR = 2025
 MAX_PREDICTION_YEAR = 2100
 HISTORICAL_SEED_END_YEAR = 2024
 
+# Angka konversi nasional GKG menjadi beras.
+# Setiap 1 ton GKG dikonversi menjadi 0,6402 ton beras.
+GKG_TO_RICE_RATE = 0.6402
+
 st.set_page_config(
     page_title="Prediksi Produksi Beras",
     page_icon="🌾",
@@ -136,6 +140,48 @@ def format_ton(value) -> str:
     )
 
 
+def add_rice_conversion_columns(
+    frame: pd.DataFrame,
+) -> pd.DataFrame:
+    """Konversi hasil prediksi GKG menjadi beras sebesar 64,02%."""
+    if frame.empty:
+        return frame.copy()
+
+    result = frame.copy()
+    result["gkg_to_rice_rate"] = GKG_TO_RICE_RATE
+
+    if "prediction_ton" in result.columns:
+        result["prediction_gkg_ton"] = pd.to_numeric(
+            result["prediction_ton"],
+            errors="coerce",
+        )
+        result["prediction_rice_ton"] = (
+            result["prediction_gkg_ton"]
+            * GKG_TO_RICE_RATE
+        )
+
+    if "actual_ton" in result.columns:
+        result["actual_gkg_ton"] = pd.to_numeric(
+            result["actual_ton"],
+            errors="coerce",
+        )
+        result["actual_rice_ton"] = (
+            result["actual_gkg_ton"]
+            * GKG_TO_RICE_RATE
+        )
+
+    if "coherence_difference_ton" in result.columns:
+        result["coherence_difference_rice_ton"] = (
+            pd.to_numeric(
+                result["coherence_difference_ton"],
+                errors="coerce",
+            )
+            * GKG_TO_RICE_RATE
+        )
+
+    result["conversion_percent"] = GKG_TO_RICE_RATE * 100.0
+    return result
+
 def validate_admin_frame(
     frame: pd.DataFrame,
     runtime: ModelRuntime,
@@ -193,9 +239,10 @@ def validate_admin_frame(
 def dashboard_page() -> None:
     st.title("🌾 Prediksi Produksi Beras")
     st.caption(
-        "XGBoost kabupaten/kota dengan same-year regression dan "
-        "hierarchical forecasting Bottom-Up hingga tingkat provinsi. "
-        "Prediktor tahun t digunakan untuk memprediksi produksi tahun t."
+        "Model memprediksi produksi padi dalam bentuk Gabah Kering "
+        "Giling (GKG). Dashboard mengonversi GKG menjadi beras dengan "
+        "angka konversi nasional 64,02%, kemudian menampilkan hasil "
+        "hierarchical forecasting Bottom-Up hingga tingkat provinsi."
     )
 
     years = load_years()
@@ -231,42 +278,57 @@ def dashboard_page() -> None:
             st.info("Data provinsi belum tersedia.")
             return
 
-        c1, c2, c3 = st.columns(3)
+        frame = add_rice_conversion_columns(frame)
+
+        c1, c2, c3, c4 = st.columns(4)
         c1.metric(
-            "Total enam provinsi",
-            format_ton(frame["prediction_ton"].sum()),
+            "Total prediksi beras",
+            format_ton(frame["prediction_rice_ton"].sum()),
         )
-        c2.metric("Jumlah provinsi", int(len(frame)))
-        c3.metric(
+        c2.metric(
+            "Total prediksi GKG",
+            format_ton(frame["prediction_gkg_ton"].sum()),
+        )
+        c3.metric("Jumlah provinsi", int(len(frame)))
+        c4.metric(
             "Jumlah kabupaten/kota",
             int(frame["child_count"].sum()),
         )
 
         chart = px.bar(
-            frame.sort_values("prediction_ton"),
-            x="prediction_ton",
+            frame.sort_values("prediction_rice_ton"),
+            x="prediction_rice_ton",
             y="province",
             orientation="h",
             labels={
-                "prediction_ton": "Prediksi produksi (ton)",
+                "prediction_rice_ton": (
+                    "Prediksi beras (ton)"
+                ),
                 "province": "Provinsi",
             },
-            title=f"Prediksi Produksi Provinsi Tahun {year}",
+            title=f"Prediksi Produksi Beras Provinsi Tahun {year}",
         )
         st.plotly_chart(chart, use_container_width=True)
 
-        table = frame[
-            [
-                "province",
-                "prediction_ton",
-                "actual_ton",
-                "child_count",
-            ]
-        ].rename(
+        table_columns = [
+            "province",
+            "prediction_rice_ton",
+            "prediction_gkg_ton",
+            "actual_rice_ton",
+            "actual_gkg_ton",
+            "conversion_percent",
+            "child_count",
+        ]
+        table = frame[table_columns].rename(
             columns={
                 "province": "Provinsi",
-                "prediction_ton": "Prediksi (ton)",
-                "actual_ton": "Aktual (ton)",
+                "prediction_rice_ton": "Prediksi Beras (ton)",
+                "prediction_gkg_ton": "Prediksi GKG (ton)",
+                "actual_rice_ton": "Aktual Beras (ton)",
+                "actual_gkg_ton": "Aktual GKG (ton)",
+                "conversion_percent": (
+                    "Konversi GKG ke Beras (%)"
+                ),
                 "child_count": "Jumlah child",
             }
         )
@@ -274,7 +336,37 @@ def dashboard_page() -> None:
             table,
             use_container_width=True,
             hide_index=True,
+            column_config={
+                "Prediksi Beras (ton)": st.column_config.NumberColumn(
+                    format="%.2f"
+                ),
+                "Prediksi GKG (ton)": st.column_config.NumberColumn(
+                    format="%.2f"
+                ),
+                "Aktual Beras (ton)": st.column_config.NumberColumn(
+                    format="%.2f"
+                ),
+                "Aktual GKG (ton)": st.column_config.NumberColumn(
+                    format="%.2f"
+                ),
+                "Konversi GKG ke Beras (%)": (
+                    st.column_config.NumberColumn(format="%.4f")
+                ),
+            },
         )
+
+        with st.expander("Metode konversi GKG menjadi beras"):
+            st.write(
+                "Beras dihitung dari prediksi GKG menggunakan:"
+            )
+            st.latex(
+                r"\hat{Y}_{beras}="
+                r"\hat{Y}_{GKG}\times 0{,}6402"
+            )
+            st.write(
+                "Nilai k_p adalah rendemen GKG ke beras tingkat "
+                "provinsi hasil SKGB 2018."
+            )
         return
 
     cities = load_city_predictions(year, province)
@@ -286,72 +378,111 @@ def dashboard_page() -> None:
         st.info("Data wilayah belum tersedia.")
         return
 
+    cities = add_rice_conversion_columns(cities)
+    province_frame = add_rice_conversion_columns(province_frame)
+
     province_row = province_frame.iloc[0]
-    c1, c2, c3 = st.columns(3)
+    c1, c2, c3, c4 = st.columns(4)
     c1.metric(
-        f"Prediksi {province}",
-        format_ton(province_row["prediction_ton"]),
+        f"Prediksi beras {province}",
+        format_ton(province_row["prediction_rice_ton"]),
     )
     c2.metric(
+        "Prediksi GKG",
+        format_ton(province_row["prediction_gkg_ton"]),
+    )
+    c3.metric(
         "Kabupaten/kota teragregasi",
         int(province_row["child_count"]),
     )
-    c3.metric(
-        "Selisih koherensi",
+    c4.metric(
+        "Selisih koherensi beras",
         format_ton(
-            province_row["coherence_difference_ton"]
+            province_row["coherence_difference_rice_ton"]
         ),
+    )
+
+    st.caption(
+        "Faktor total konversi GKG menjadi beras untuk konsumsi "
+        f"pangan penduduk di {province}: "
+        f"{province_row['conversion_percent']:.4f}%."
     )
 
     trend = load_province_predictions(None, province)
     if not trend.empty and trend["year"].nunique() > 1:
+        trend = add_rice_conversion_columns(trend)
         line = px.line(
             trend.sort_values("year"),
             x="year",
-            y="prediction_ton",
+            y="prediction_rice_ton",
             markers=True,
             labels={
                 "year": "Tahun",
-                "prediction_ton": "Produksi (ton)",
+                "prediction_rice_ton": (
+                    "Produksi beras (ton)"
+                ),
             },
-            title=f"Tren Prediksi Provinsi {province}",
+            title=f"Tren Prediksi Beras Provinsi {province}",
         )
         st.plotly_chart(line, use_container_width=True)
 
     bar = px.bar(
-        cities.sort_values("prediction_ton"),
-        x="prediction_ton",
+        cities.sort_values("prediction_rice_ton"),
+        x="prediction_rice_ton",
         y="city",
         orientation="h",
         height=max(500, 28 * len(cities)),
         labels={
-            "prediction_ton": "Prediksi produksi (ton)",
+            "prediction_rice_ton": (
+                "Prediksi beras (ton)"
+            ),
             "city": "Kabupaten/Kota",
         },
-        title=f"Rincian Kabupaten/Kota Tahun {year}",
+        title=f"Rincian Prediksi Beras Kabupaten/Kota Tahun {year}",
     )
     st.plotly_chart(bar, use_container_width=True)
 
-    st.dataframe(
+    city_table = (
         cities[
             [
                 "city",
-                "prediction_ton",
-                "actual_ton",
+                "prediction_rice_ton",
+                "prediction_gkg_ton",
+                "actual_rice_ton",
+                "actual_gkg_ton",
                 "source",
             ]
         ]
         .rename(
             columns={
                 "city": "Kabupaten/Kota",
-                "prediction_ton": "Prediksi (ton)",
-                "actual_ton": "Aktual (ton)",
+                "prediction_rice_ton": "Prediksi Beras (ton)",
+                "prediction_gkg_ton": "Prediksi GKG (ton)",
+                "actual_rice_ton": "Aktual Beras (ton)",
+                "actual_gkg_ton": "Aktual GKG (ton)",
                 "source": "Sumber",
             }
         )
-        .sort_values("Prediksi (ton)", ascending=False),
+        .sort_values("Prediksi Beras (ton)", ascending=False)
+    )
+    st.dataframe(
+        city_table,
         use_container_width=True,
         hide_index=True,
+        column_config={
+            "Prediksi Beras (ton)": st.column_config.NumberColumn(
+                format="%.2f"
+            ),
+            "Prediksi GKG (ton)": st.column_config.NumberColumn(
+                format="%.2f"
+            ),
+            "Aktual Beras (ton)": st.column_config.NumberColumn(
+                format="%.2f"
+            ),
+            "Aktual GKG (ton)": st.column_config.NumberColumn(
+                format="%.2f"
+            ),
+        },
     )
 
 
@@ -514,8 +645,9 @@ def admin_page() -> None:
         ),
     )
     st.caption(
-        f"Data prediktor {int(year)} akan digunakan untuk memprediksi "
-        f"produksi beras tahun {int(year)}."
+        f"Data prediktor {int(year)} digunakan untuk memprediksi GKG "
+        f"tahun {int(year)}. Hasil GKG kemudian dikonversi menjadi "
+        "beras untuk konsumsi pangan penduduk."
     )
 
     template = pd.read_csv(
@@ -630,8 +762,29 @@ def admin_page() -> None:
                 "119 kabupaten/kota dan agregasi Bottom-Up menjadi "
                 "enam provinsi berhasil."
             )
+            province_display = add_rice_conversion_columns(
+                province_predictions
+            )
             st.dataframe(
-                province_predictions,
+                province_display[
+                    [
+                        "province",
+                        "prediction_rice_ton",
+                        "prediction_gkg_ton",
+                        "conversion_percent",
+                        "child_count",
+                    ]
+                ].rename(
+                    columns={
+                        "province": "Provinsi",
+                        "prediction_rice_ton": "Prediksi Beras (ton)",
+                        "prediction_gkg_ton": "Prediksi GKG (ton)",
+                        "conversion_percent": (
+                            "Konversi GKG ke Beras (%)"
+                        ),
+                        "child_count": "Jumlah child",
+                    }
+                ),
                 use_container_width=True,
                 hide_index=True,
             )
@@ -659,6 +812,9 @@ st.sidebar.caption(
 )
 st.sidebar.caption(
     "Metode final: Bottom-Up"
+)
+st.sidebar.caption(
+    "Output model: GKG → beras (× 64,02%)"
 )
 
 try:
