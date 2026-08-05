@@ -12,6 +12,15 @@ from pathlib import Path
 
 
 # Nama kolom yang diterima dari template admin.
+EXPECTED_SCENARIO_NAME = (
+    "02_split_s2__02_target_dengan_capping"
+)
+EXPECTED_TRAIN_YEARS = list(range(2010, 2024))
+EXPECTED_VALIDATION_YEARS = [2024]
+EXPECTED_TEST_YEARS = [2025]
+EXPECTED_TARGET_CAPPING = True
+
+
 RAW_REQUIRED_COLUMNS = [
     "tahun",
     "provinsi",
@@ -166,10 +175,39 @@ class ModelRuntime:
             )
 
     def _validate_artifact_compatibility(self) -> None:
-        if self.scenario_name != "01_skenario_target_tanpa_capping":
+        if self.scenario_name != EXPECTED_SCENARIO_NAME:
             raise ArtifactNotReadyError(
-                "Preprocessor bukan skenario target tanpa capping: "
-                f"{self.scenario_name!r}."
+                "Preprocessor tidak sesuai model versi 2. "
+                f"Ditemukan={self.scenario_name!r}; "
+                f"wajib={EXPECTED_SCENARIO_NAME!r}."
+            )
+
+        if bool(self.preprocessor.get("cap_target")) is not (
+            EXPECTED_TARGET_CAPPING
+        ):
+            raise ArtifactNotReadyError(
+                "Preprocessor wajib menggunakan target dengan capping."
+            )
+
+        if list(self.preprocessor.get("train_years", [])) != (
+            EXPECTED_TRAIN_YEARS
+        ):
+            raise ArtifactNotReadyError(
+                "Train preprocessor wajib 2010–2023."
+            )
+
+        if list(self.preprocessor.get("validation_years", [])) != (
+            EXPECTED_VALIDATION_YEARS
+        ):
+            raise ArtifactNotReadyError(
+                "Validation preprocessor wajib tahun 2024."
+            )
+
+        if list(self.preprocessor.get("test_years", [])) != (
+            EXPECTED_TEST_YEARS
+        ):
+            raise ArtifactNotReadyError(
+                "Test preprocessor wajib tahun 2025."
             )
         if self.dataset_mode != "kabkota":
             raise ArtifactNotReadyError(
@@ -340,8 +378,9 @@ class ModelRuntime:
                 "Prediktor numerik mengandung infinity."
             )
 
-        # Pada skenario tanpa capping, yang tidak dicapping adalah TARGET.
-        # Capping fitur tetap mengikuti batas Train yang tersimpan.
+        # Capping fitur mengikuti batas Train pada preprocessor v2.
+        # Target capping sudah diterapkan saat preprocessing/training;
+        # input website tidak memuat kolom target.
         numeric = self._apply_feature_capping(numeric)
 
         transformed_numeric = numeric.copy()
