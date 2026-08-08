@@ -536,6 +536,7 @@ def admin_page() -> None:
             store.sign_out()
         finally:
             st.session_state.clear()
+            st.session_state["logout_success"] = True
             st.rerun()
 
     try:
@@ -744,6 +745,9 @@ page = st.sidebar.radio(
     "Navigasi",
     ["Dashboard", "Admin"],
 )
+
+if st.session_state.pop("logout_success", False):
+    st.success("Logout berhasil. Anda telah keluar dari akun admin.")
 st.sidebar.caption(
     "Hierarki: kabupaten/kota → provinsi"
 )
