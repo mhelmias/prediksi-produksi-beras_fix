@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 
 # Same-year regression:
-# prediktor tahun 2025 digunakan untuk memprediksi produksi tahun 2025.
+# prediktor tahun 2025 digunakan untuk mengestimasi produksi tahun 2025.
 DEFAULT_PREDICTION_YEAR = 2025
 MIN_PREDICTION_YEAR = 2025
 MAX_PREDICTION_YEAR = 2100
@@ -36,7 +36,7 @@ HISTORICAL_SEED_END_YEAR = 2024
 GKG_TO_RICE_RATE = 0.6402
 
 st.set_page_config(
-    page_title="Prediksi Produksi Beras",
+    page_title="Estimasi Produksi Beras",
     page_icon="🌾",
     layout="wide",
 )
@@ -143,7 +143,7 @@ def format_ton(value) -> str:
 def add_rice_conversion_columns(
     frame: pd.DataFrame,
 ) -> pd.DataFrame:
-    """Konversi hasil prediksi GKG menjadi beras sebesar 64,02%."""
+    """Konversi hasil estimasi GKG menjadi beras sebesar 64,02%."""
     if frame.empty:
         return frame.copy()
 
@@ -237,9 +237,9 @@ def validate_admin_frame(
 
 
 def dashboard_page() -> None:
-    st.title("🌾 Prediksi Produksi Beras")
+    st.title("🌾 Estimasi Produksi Beras")
     st.caption(
-        "Model memprediksi produksi padi dalam bentuk Gabah Kering "
+        "Model mengestimasi produksi padi dalam bentuk Gabah Kering "
         "Giling (GKG) pada 119 kabupaten/kota yang tersebar di 6 provinsi "
         "di Pulau Jawa. Dashboard mengonversi GKG menjadi beras dengan "
         "angka konversi nasional 64,02%, kemudian menampilkan hasil "
@@ -255,8 +255,8 @@ def dashboard_page() -> None:
         return
     if not years:
         st.warning(
-            "Belum ada hasil prediksi. Login sebagai admin untuk "
-            "memasukkan hasil awal atau menjalankan prediksi."
+            "Belum ada hasil estimasi. Login sebagai admin untuk "
+            "memasukkan hasil awal atau menjalankan estimasi."
         )
         return
 
@@ -283,11 +283,11 @@ def dashboard_page() -> None:
 
         c1, c2 = st.columns(2)
         c1.metric(
-            "Total prediksi beras",
+            "Total estimasi beras",
             format_ton(frame["prediction_rice_ton"].sum()),
         )
         c2.metric(
-            "Total prediksi GKG",
+            "Total estimasi GKG",
             format_ton(frame["prediction_gkg_ton"].sum()),
         )
 
@@ -298,11 +298,11 @@ def dashboard_page() -> None:
             orientation="h",
             labels={
                 "prediction_rice_ton": (
-                    "Prediksi beras (ton)"
+                    "Estimasi beras (ton)"
                 ),
                 "province": "Provinsi",
             },
-            title=f"Prediksi Produksi Beras Provinsi Tahun {year}",
+            title=f"Estimasi Produksi Beras Provinsi Tahun {year}",
         )
         st.plotly_chart(chart, use_container_width=True)
 
@@ -318,8 +318,8 @@ def dashboard_page() -> None:
         table = frame[table_columns].rename(
             columns={
                 "province": "Provinsi",
-                "prediction_rice_ton": "Prediksi Beras (ton)",
-                "prediction_gkg_ton": "Prediksi GKG (ton)",
+                "prediction_rice_ton": "Estimasi Beras (ton)",
+                "prediction_gkg_ton": "Estimasi GKG (ton)",
                 "actual_rice_ton": "Aktual Beras (ton)",
                 "actual_gkg_ton": "Aktual GKG (ton)",
                 "conversion_percent": (
@@ -333,10 +333,10 @@ def dashboard_page() -> None:
             use_container_width=True,
             hide_index=True,
             column_config={
-                "Prediksi Beras (ton)": st.column_config.NumberColumn(
+                "Estimasi Beras (ton)": st.column_config.NumberColumn(
                     format="%.2f"
                 ),
-                "Prediksi GKG (ton)": st.column_config.NumberColumn(
+                "Estimasi GKG (ton)": st.column_config.NumberColumn(
                     format="%.2f"
                 ),
                 "Aktual Beras (ton)": st.column_config.NumberColumn(
@@ -353,7 +353,7 @@ def dashboard_page() -> None:
 
         with st.expander("Metode konversi GKG menjadi beras"):
             st.write(
-                "Beras dihitung dari prediksi GKG menggunakan:"
+                "Beras dihitung dari estimasi GKG menggunakan:"
             )
             st.latex(
                 r"\hat{Y}_{beras}="
@@ -380,11 +380,11 @@ def dashboard_page() -> None:
     province_row = province_frame.iloc[0]
     c1, c2, c3, c4 = st.columns(4)
     c1.metric(
-        f"Prediksi beras {province}",
+        f"Estimasi beras {province}",
         format_ton(province_row["prediction_rice_ton"]),
     )
     c2.metric(
-        "Prediksi GKG",
+        "Estimasi GKG",
         format_ton(province_row["prediction_gkg_ton"]),
     )
     c3.metric(
@@ -418,7 +418,7 @@ def dashboard_page() -> None:
                     "Produksi beras (ton)"
                 ),
             },
-            title=f"Tren Prediksi Beras Provinsi {province}",
+            title=f"Tren Estimasi Beras Provinsi {province}",
         )
         st.plotly_chart(line, use_container_width=True)
 
@@ -430,11 +430,11 @@ def dashboard_page() -> None:
         height=max(500, 28 * len(cities)),
         labels={
             "prediction_rice_ton": (
-                "Prediksi beras (ton)"
+                "Estimasi beras (ton)"
             ),
             "city": "Kabupaten/Kota",
         },
-        title=f"Rincian Prediksi Beras Kabupaten/Kota Tahun {year}",
+        title=f"Rincian Estimasi Beras Kabupaten/Kota Tahun {year}",
     )
     st.plotly_chart(bar, use_container_width=True)
 
@@ -452,24 +452,24 @@ def dashboard_page() -> None:
         .rename(
             columns={
                 "city": "Kabupaten/Kota",
-                "prediction_rice_ton": "Prediksi Beras (ton)",
-                "prediction_gkg_ton": "Prediksi GKG (ton)",
+                "prediction_rice_ton": "Estimasi Beras (ton)",
+                "prediction_gkg_ton": "Estimasi GKG (ton)",
                 "actual_rice_ton": "Aktual Beras (ton)",
                 "actual_gkg_ton": "Aktual GKG (ton)",
                 "source": "Sumber",
             }
         )
-        .sort_values("Prediksi Beras (ton)", ascending=False)
+        .sort_values("Estimasi Beras (ton)", ascending=False)
     )
     st.dataframe(
         city_table,
         use_container_width=True,
         hide_index=True,
         column_config={
-            "Prediksi Beras (ton)": st.column_config.NumberColumn(
+            "Estimasi Beras (ton)": st.column_config.NumberColumn(
                 format="%.2f"
             ),
-            "Prediksi GKG (ton)": st.column_config.NumberColumn(
+            "Estimasi GKG (ton)": st.column_config.NumberColumn(
                 format="%.2f"
             ),
             "Aktual Beras (ton)": st.column_config.NumberColumn(
@@ -630,18 +630,18 @@ def admin_page() -> None:
             st.error(f"Seed gagal: {exc}")
 
     year = st.number_input(
-        "Tahun prediksi",
+        "Tahun estimasi",
         min_value=MIN_PREDICTION_YEAR,
         max_value=MAX_PREDICTION_YEAR,
         value=DEFAULT_PREDICTION_YEAR,
         step=1,
         help=(
             "Same-year regression: data prediktor tahun yang dipilih "
-            "digunakan untuk memprediksi produksi pada tahun yang sama."
+            "digunakan untuk mengestimasi produksi pada tahun yang sama."
         ),
     )
     st.caption(
-        f"Data prediktor {int(year)} digunakan untuk memprediksi GKG "
+        f"Data prediktor {int(year)} digunakan untuk mengestimasi GKG "
         f"tahun {int(year)}. Hasil GKG kemudian dikonversi menjadi "
         "beras untuk konsumsi pangan penduduk."
     )
@@ -691,7 +691,7 @@ def admin_page() -> None:
 
         if csv_years != [selected_year]:
             raise ValueError(
-                "Tahun pada CSV harus sama dengan tahun prediksi yang "
+                "Tahun pada CSV harus sama dengan tahun estimasi yang "
                 f"dipilih. Pilihan admin={selected_year}, "
                 f"tahun dalam CSV={csv_years}."
             )
@@ -705,7 +705,7 @@ def admin_page() -> None:
         return
 
     if st.button(
-        "Simpan prediktor dan jalankan prediksi",
+        "Simpan prediktor dan jalankan estimasi",
         type="primary",
     ):
         batch_id = None
@@ -737,7 +737,7 @@ def admin_page() -> None:
             )
             if actual != expected:
                 raise HierarchyValidationError(
-                    "Jumlah child hasil prediksi tidak sesuai: "
+                    "Jumlah child hasil estimasi tidak sesuai: "
                     f"{actual}; wajib={expected}."
                 )
 
@@ -754,7 +754,7 @@ def admin_page() -> None:
                 validated["tahun"].iloc[0]
             )
             st.success(
-                f"Prediksi produksi tahun {prediction_year} untuk "
+                f"Estimasi produksi tahun {prediction_year} untuk "
                 "119 kabupaten/kota dan agregasi Bottom-Up menjadi "
                 "enam provinsi berhasil."
             )
@@ -773,8 +773,8 @@ def admin_page() -> None:
                 ].rename(
                     columns={
                         "province": "Provinsi",
-                        "prediction_rice_ton": "Prediksi Beras (ton)",
-                        "prediction_gkg_ton": "Prediksi GKG (ton)",
+                        "prediction_rice_ton": "Estimasi Beras (ton)",
+                        "prediction_gkg_ton": "Estimasi GKG (ton)",
                         "conversion_percent": (
                             "Konversi GKG ke Beras (%)"
                         ),
@@ -792,7 +792,7 @@ def admin_page() -> None:
         ) as exc:
             if batch_id:
                 store.update_batch(batch_id, "failed", str(exc))
-            st.error(f"Prediksi gagal: {exc}")
+            st.error(f"Estimasi gagal: {exc}")
         except Exception as exc:
             if batch_id:
                 store.update_batch(batch_id, "failed", str(exc))
