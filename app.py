@@ -240,7 +240,8 @@ def dashboard_page() -> None:
     st.title("🌾 Prediksi Produksi Beras")
     st.caption(
         "Model memprediksi produksi padi dalam bentuk Gabah Kering "
-        "Giling (GKG). Dashboard mengonversi GKG menjadi beras dengan "
+        "Giling (GKG) pada 119 kabupaten/kota yang tersebar di 6 provinsi "
+        "di Pulau Jawa. Dashboard mengonversi GKG menjadi beras dengan "
         "angka konversi nasional 64,02%, kemudian menampilkan hasil "
         "hierarchical forecasting Bottom-Up hingga tingkat provinsi."
     )
@@ -280,7 +281,7 @@ def dashboard_page() -> None:
 
         frame = add_rice_conversion_columns(frame)
 
-        c1, c2, c3, c4 = st.columns(4)
+        c1, c2 = st.columns(2)
         c1.metric(
             "Total prediksi beras",
             format_ton(frame["prediction_rice_ton"].sum()),
@@ -288,11 +289,6 @@ def dashboard_page() -> None:
         c2.metric(
             "Total prediksi GKG",
             format_ton(frame["prediction_gkg_ton"].sum()),
-        )
-        c3.metric("Jumlah provinsi", int(len(frame)))
-        c4.metric(
-            "Jumlah kabupaten/kota",
-            int(frame["child_count"].sum()),
         )
 
         chart = px.bar(
