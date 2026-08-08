@@ -29,7 +29,6 @@ DATA_DIR = BASE_DIR / "data"
 DEFAULT_PREDICTION_YEAR = 2025
 MIN_PREDICTION_YEAR = 2025
 MAX_PREDICTION_YEAR = 2100
-HISTORICAL_SEED_END_YEAR = 2024
 
 # Angka konversi nasional GKG menjadi beras.
 # Setiap 1 ton GKG dikonversi menjadi 0,6402 ton beras.
@@ -511,51 +510,6 @@ def login_form() -> None:
             st.error(f"Login gagal: {exc}")
 
 
-def seed_historical(
-    store: SupabaseStore,
-) -> None:
-    """Masukkan hasil historis hanya sampai 2024."""
-    seed_path = DATA_DIR / "seed_predictions_2022_2025.csv"
-    frame = pd.read_csv(seed_path)
-
-    if "year" not in frame.columns:
-        raise ValueError("File seed tidak memiliki kolom 'year'.")
-
-    frame["year"] = pd.to_numeric(
-        frame["year"],
-        errors="raise",
-    ).astype(int)
-    frame = frame.loc[
-        frame["year"] <= HISTORICAL_SEED_END_YEAR
-    ].copy()
-
-    if frame.empty:
-        raise ValueError(
-            "Tidak ada data seed historis sampai tahun "
-            f"{HISTORICAL_SEED_END_YEAR}."
-        )
-
-    city = frame[
-        [
-            "year",
-            "province",
-            "city",
-            "prediction_ton",
-            "actual_ton",
-        ]
-    ].copy()
-    province = aggregate_provinces(city)
-    store.upsert_predictions(
-        batch_id=None,
-        city_frame=city,
-        province_frame=province,
-        source=(
-            "hasil_model_2022_"
-            f"{HISTORICAL_SEED_END_YEAR}"
-        ),
-    )
-    clear_prediction_cache()
-
 
 def admin_page() -> None:
     st.title("🔐 Admin data prediktor")
@@ -615,19 +569,6 @@ def admin_page() -> None:
             .nunique()
             .to_dict(),
         )
-
-    if st.button(
-        f"Masukkan hasil historis 2022–{HISTORICAL_SEED_END_YEAR}"
-    ):
-        try:
-            seed_historical(store)
-            st.success(
-                "Data historis 2022–"
-                f"{HISTORICAL_SEED_END_YEAR} berhasil disimpan. "
-                "Tahun 2025 tidak dimasukkan sebagai seed."
-            )
-        except Exception as exc:
-            st.error(f"Seed gagal: {exc}")
 
     year = st.number_input(
         "Tahun estimasi",
