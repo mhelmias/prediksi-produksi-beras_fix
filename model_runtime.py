@@ -1,504 +1,822 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
-from typing import Any
-
-import joblib
-import numpy as np
-import pandas as pd
-from xgboost import XGBRegressor
-
 from pathlib import Path
 
+import pandas as pd
+import plotly.express as px
+import streamlit as st
 
-# Nama kolom yang diterima dari template admin.
-EXPECTED_SCENARIO_NAME = (
-    "02_split_s2__02_target_dengan_capping"
+from artifact_loader import resolve_artifacts
+from hierarchy import (
+    HierarchyValidationError,
+    aggregate_provinces,
+    validate_complete_regions,
 )
-EXPECTED_TRAIN_YEARS = list(range(2010, 2024))
-EXPECTED_VALIDATION_YEARS = [2024]
-EXPECTED_TEST_YEARS = [2025]
-EXPECTED_TARGET_CAPPING = True
+from model_runtime import (
+    ArtifactNotReadyError,
+    ModelRuntime,
+    PredictorValidationError,
+    RAW_REQUIRED_COLUMNS,
+)
+from supabase_store import SupabaseStore
 
 
-RAW_REQUIRED_COLUMNS = [
-    "tahun",
-    "provinsi",
-    "kabupaten_kota",
-    "luas panen (ha)",
-    "suhu min (oc)",
-    "suhu rata-rata (oc)",
-    "suhu maks (oc)",
-    "kelembapan (%)",
-    "curah hujan (mm)",
-    "jumlah hari hujan (hari)",
-    "kecepatan angin (m/s)",
-    "tekanan udara (mb)",
-    "radiasi_matahari_kwh_m2_hari",
-    "annual_soi_bom",
-    "annual_dmi",
-    "soi_bom_label",
-]
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR / "data"
+
+# Same-year regression:
+# prediktor tahun 2025 digunakan untuk mengestimasi produksi tahun 2025.
+DEFAULT_PREDICTION_YEAR = 2025
+MIN_PREDICTION_YEAR = 2025
+MAX_PREDICTION_YEAR = 2100
+HISTORICAL_SEED_END_YEAR = 2024
+
+# Angka konversi nasional GKG menjadi beras.
+# Setiap 1 ton GKG dikonversi menjadi 0,6402 ton beras.
+GKG_TO_RICE_RATE = 0.6402
+
+st.set_page_config(
+    page_title="Estimasi Produksi Beras",
+    page_icon="🌾",
+    layout="wide",
+)
 
 
-class ArtifactNotReadyError(RuntimeError):
-    """Artefak model/preprocessor tidak lengkap atau tidak sesuai."""
+def secret(name: str, default: str = "") -> str:
+    try:
+        return str(st.secrets.get(name, default))
+    except Exception:
+        return default
 
 
-class PredictorValidationError(ValueError):
-    """Data prediktor mentah tidak sesuai artefak preprocessing."""
+SUPABASE_URL = secret("SUPABASE_URL")
+SUPABASE_KEY = secret("SUPABASE_PUBLISHABLE_KEY")
+HF_REPO_ID = secret("HF_MODEL_REPO_ID")
+HF_REVISION = secret("HF_MODEL_REVISION", "main")
+HF_TOKEN = secret("HF_TOKEN")
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    st.error(
+        "SUPABASE_URL dan SUPABASE_PUBLISHABLE_KEY belum diisi "
+        "pada Streamlit Secrets."
+    )
+    st.stop()
 
 
-@dataclass
-class ArtifactStatus:
-    model_loaded: bool
-    preprocessor_found: bool
-    target_inverse_ready: bool
-    feature_preprocessing_ready: bool
-    n_model_features: int
-    scenario_name: str | None
-    dataset_mode: str | None
-    message: str
-
-    def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+def public_store() -> SupabaseStore:
+    return SupabaseStore(SUPABASE_URL, SUPABASE_KEY)
 
 
-class ModelRuntime:
-    """
-    Runtime deployment untuk alur:
+def authenticated_store() -> SupabaseStore:
+    return SupabaseStore(
+        SUPABASE_URL,
+        SUPABASE_KEY,
+        st.session_state.get("access_token"),
+        st.session_state.get("refresh_token"),
+    )
 
-    prediktor mentah
-      -> capping fitur memakai batas Train
-      -> Yeo-Johnson fitur
-      -> MinMaxScaler fitur
-      -> OneHotEncoder
-      -> susun 141 fitur model
-      -> XGBoost
-      -> inverse target scaler
-      -> inverse target Yeo-Johnson
-      -> clip prediksi negatif menjadi nol
-    """
 
-    REQUIRED_PREPROCESSOR_KEYS = {
-        "onehot_encoder",
-        "scaler",
-        "categorical_cols",
-        "numeric_cols",
-        "feature_transformers",
-        "yeojohnson_feature_cols",
-        "target_scaler",
-        "target_transformer",
+@st.cache_resource(show_spinner="Memuat model dan preprocessor...")
+def load_runtime(
+    repo_id: str,
+    revision: str,
+    token: str,
+) -> tuple[ModelRuntime, str]:
+    paths = resolve_artifacts(
+        repo_id=repo_id or None,
+        revision=revision,
+        token=token or None,
+    )
+    runtime = ModelRuntime(
+        model_path=paths.model_path,
+        preprocessor_path=paths.preprocessor_path,
+    )
+    return runtime, paths.source
+
+
+@st.cache_data(ttl=60)
+def load_regions() -> pd.DataFrame:
+    return public_store().fetch_regions()
+
+
+@st.cache_data(ttl=60)
+def load_years() -> list[int]:
+    return public_store().list_years()
+
+
+@st.cache_data(ttl=60)
+def load_city_predictions(
+    year: int | None = None,
+    province: str | None = None,
+) -> pd.DataFrame:
+    return public_store().fetch_city_predictions(year, province)
+
+
+@st.cache_data(ttl=60)
+def load_province_predictions(
+    year: int | None = None,
+    province: str | None = None,
+) -> pd.DataFrame:
+    return public_store().fetch_province_predictions(
+        year,
+        province,
+    )
+
+
+def clear_prediction_cache() -> None:
+    load_years.clear()
+    load_city_predictions.clear()
+    load_province_predictions.clear()
+
+
+def format_ton(value) -> str:
+    if value is None or pd.isna(value):
+        return "-"
+    return (
+        f"{float(value):,.2f} ton"
+        .replace(",", "X")
+        .replace(".", ",")
+        .replace("X", ".")
+    )
+
+
+def add_rice_conversion_columns(
+    frame: pd.DataFrame,
+) -> pd.DataFrame:
+    """Konversi hasil estimasi GKG menjadi beras sebesar 64,02%."""
+    if frame.empty:
+        return frame.copy()
+
+    result = frame.copy()
+    result["gkg_to_rice_rate"] = GKG_TO_RICE_RATE
+
+    if "prediction_ton" in result.columns:
+        result["prediction_gkg_ton"] = pd.to_numeric(
+            result["prediction_ton"],
+            errors="coerce",
+        )
+        result["prediction_rice_ton"] = (
+            result["prediction_gkg_ton"]
+            * GKG_TO_RICE_RATE
+        )
+
+    if "actual_ton" in result.columns:
+        result["actual_gkg_ton"] = pd.to_numeric(
+            result["actual_ton"],
+            errors="coerce",
+        )
+        result["actual_rice_ton"] = (
+            result["actual_gkg_ton"]
+            * GKG_TO_RICE_RATE
+        )
+
+    if "coherence_difference_ton" in result.columns:
+        result["coherence_difference_rice_ton"] = (
+            pd.to_numeric(
+                result["coherence_difference_ton"],
+                errors="coerce",
+            )
+            * GKG_TO_RICE_RATE
+        )
+
+    result["conversion_percent"] = GKG_TO_RICE_RATE * 100.0
+    return result
+
+def validate_admin_frame(
+    frame: pd.DataFrame,
+    runtime: ModelRuntime,
+    regions: pd.DataFrame,
+) -> pd.DataFrame:
+    result = frame.copy()
+    aliases = {
+        "Kabupaten/kota": "kabupaten_kota",
+        "kabupaten/kota": "kabupaten_kota",
+        "kabupaten kota": "kabupaten_kota",
     }
+    for old, new in aliases.items():
+        if old in result.columns and new not in result.columns:
+            result = result.rename(columns={old: new})
 
-    def __init__(
-        self,
-        model_path: str | Path,
-        preprocessor_path: str | Path,
-    ) -> None:
-        self.model_path = Path(model_path)
-        self.preprocessor_path = Path(preprocessor_path)
-        if not self.model_path.exists():
-            raise ArtifactNotReadyError(
-                f"Model tidak ditemukan: {self.model_path}"
+    model_ready = set(runtime.feature_names).issubset(
+        result.columns
+    )
+    missing_raw = [
+        column
+        for column in RAW_REQUIRED_COLUMNS
+        if column not in result.columns
+    ]
+    if missing_raw and not model_ready:
+        raise ValueError(
+            "Kolom prediktor belum lengkap: "
+            + ", ".join(missing_raw)
+        )
+
+    required = (
+        runtime.feature_names
+        if model_ready
+        else RAW_REQUIRED_COLUMNS
+    )
+    empty_columns = []
+    for column in required:
+        values = result[column]
+        missing = values.isna()
+        if values.dtype == object:
+            missing = missing | (
+                values.astype(str).str.strip() == ""
             )
+        if bool(missing.any()):
+            empty_columns.append(column)
+    if empty_columns:
+        raise ValueError(
+            "Nilai kosong ditemukan pada kolom: "
+            + ", ".join(empty_columns)
+        )
 
-        self.model = XGBRegressor()
-        self.model.load_model(self.model_path)
-        booster = self.model.get_booster()
-        self.feature_names = list(booster.feature_names or [])
-        if not self.feature_names:
-            raise ArtifactNotReadyError(
-                "Model XGBoost tidak menyimpan nama fitur."
-            )
+    validate_complete_regions(result, regions)
+    return result
 
-        self.preprocessor: dict[str, Any] | None = None
-        self.onehot_encoder: Any | None = None
-        self.feature_scaler: Any | None = None
-        self.feature_transformers: dict[str, Any] = {}
-        self.target_scaler: Any | None = None
-        self.target_transformer: Any | None = None
-        self.numeric_cols: list[str] = []
-        self.categorical_cols: list[str] = []
-        self.yeojohnson_feature_cols: list[str] = []
-        self.capping_bounds: pd.DataFrame = pd.DataFrame()
-        self.scenario_name: str | None = None
-        self.dataset_mode: str | None = None
-        self._preprocessor_error: str | None = None
-        self._load_preprocessor()
 
-    def _load_preprocessor(self) -> None:
-        if not self.preprocessor_path.exists():
-            self._preprocessor_error = (
-                "preprocessor.joblib belum tersedia pada artifacts/."
-            )
+def dashboard_page() -> None:
+    st.title("🌾 Estimasi Produksi Beras")
+    st.caption(
+        "Model mengestimasi produksi padi dalam bentuk Gabah Kering "
+        "Giling (GKG) pada 119 kabupaten/kota yang tersebar di 6 provinsi "
+        "di Pulau Jawa. Dashboard mengonversi GKG menjadi beras dengan "
+        "angka konversi nasional 64,02%, kemudian menampilkan hasil "
+        "hierarchical forecasting Bottom-Up hingga tingkat provinsi."
+    )
+
+    years = load_years()
+    regions = load_regions()
+    if regions.empty:
+        st.warning(
+            "Tabel regions masih kosong. Jalankan seed_regions.sql."
+        )
+        return
+    if not years:
+        st.warning(
+            "Belum ada hasil estimasi. Login sebagai admin untuk "
+            "memasukkan hasil awal atau menjalankan estimasi."
+        )
+        return
+
+    left, right = st.columns([1, 2])
+    year = left.selectbox(
+        "Tahun",
+        options=sorted(years, reverse=True),
+    )
+    province_options = sorted(
+        regions["province"].unique().tolist()
+    )
+    province = right.selectbox(
+        "Wilayah",
+        options=["Semua Provinsi", *province_options],
+    )
+
+    if province == "Semua Provinsi":
+        frame = load_province_predictions(year)
+        if frame.empty:
+            st.info("Data provinsi belum tersedia.")
             return
 
-        try:
-            source = joblib.load(self.preprocessor_path)
-            if not isinstance(source, dict):
-                raise TypeError(
-                    "Preprocessor deployment wajib berupa dictionary."
-                )
+        frame = add_rice_conversion_columns(frame)
 
-            missing = sorted(
-                self.REQUIRED_PREPROCESSOR_KEYS.difference(source.keys())
-            )
-            if missing:
-                raise KeyError(
-                    "Key preprocessor tidak lengkap: " + ", ".join(missing)
-                )
-
-            self.preprocessor = source
-            self.onehot_encoder = source["onehot_encoder"]
-            self.feature_scaler = source["scaler"]
-            self.feature_transformers = dict(
-                source["feature_transformers"]
-            )
-            self.target_scaler = source["target_scaler"]
-            self.target_transformer = source["target_transformer"]
-            self.numeric_cols = list(source["numeric_cols"])
-            self.categorical_cols = list(source["categorical_cols"])
-            self.yeojohnson_feature_cols = list(
-                source["yeojohnson_feature_cols"]
-            )
-            self.capping_bounds = source.get(
-                "capping_bounds", pd.DataFrame()
-            )
-            self.scenario_name = source.get("scenario_name")
-            self.dataset_mode = source.get("dataset_mode")
-
-            self._validate_artifact_compatibility()
-        except Exception as exc:
-            self._preprocessor_error = (
-                f"Gagal memuat preprocessor deployment: {exc}"
-            )
-
-    def _validate_artifact_compatibility(self) -> None:
-        if self.scenario_name != EXPECTED_SCENARIO_NAME:
-            raise ArtifactNotReadyError(
-                "Preprocessor tidak sesuai model versi 2. "
-                f"Ditemukan={self.scenario_name!r}; "
-                f"wajib={EXPECTED_SCENARIO_NAME!r}."
-            )
-
-        if bool(self.preprocessor.get("cap_target")) is not (
-            EXPECTED_TARGET_CAPPING
-        ):
-            raise ArtifactNotReadyError(
-                "Preprocessor wajib menggunakan target dengan capping."
-            )
-
-        if list(self.preprocessor.get("train_years", [])) != (
-            EXPECTED_TRAIN_YEARS
-        ):
-            raise ArtifactNotReadyError(
-                "Train preprocessor wajib 2010–2023."
-            )
-
-        if list(self.preprocessor.get("validation_years", [])) != (
-            EXPECTED_VALIDATION_YEARS
-        ):
-            raise ArtifactNotReadyError(
-                "Validation preprocessor wajib tahun 2024."
-            )
-
-        if list(self.preprocessor.get("test_years", [])) != (
-            EXPECTED_TEST_YEARS
-        ):
-            raise ArtifactNotReadyError(
-                "Test preprocessor wajib tahun 2025."
-            )
-        if self.dataset_mode != "kabkota":
-            raise ArtifactNotReadyError(
-                f"Preprocessor bukan dataset kabupaten/kota: {self.dataset_mode!r}."
-            )
-
-        expected_numeric = list(
-            getattr(self.feature_scaler, "feature_names_in_", [])
+        c1, c2 = st.columns(2)
+        c1.metric(
+            "Total estimasi beras",
+            format_ton(frame["prediction_rice_ton"].sum()),
         )
-        if expected_numeric and expected_numeric != self.numeric_cols:
-            raise ArtifactNotReadyError(
-                "Urutan numeric_cols berbeda dari scaler fitur."
-            )
-
-        encoded_names = list(
-            self.onehot_encoder.get_feature_names_out(
-                self.categorical_cols
-            )
-        )
-        preprocessor_names = self.numeric_cols + encoded_names
-        model_equivalent_names = [
-            "tahun.1" if name == "tahun" else name
-            for name in preprocessor_names
-        ]
-        if model_equivalent_names != self.feature_names:
-            mismatch = [
-                (i, left, right)
-                for i, (left, right) in enumerate(
-                    zip(
-                        model_equivalent_names,
-                        self.feature_names,
-                        strict=False,
-                    )
-                )
-                if left != right
-            ]
-            raise ArtifactNotReadyError(
-                "Urutan/nama fitur preprocessor tidak cocok dengan model. "
-                f"Contoh mismatch: {mismatch[:5]}."
-            )
-
-        if len(self.feature_names) != 141:
-            raise ArtifactNotReadyError(
-                "Model deployment diharapkan memiliki 141 fitur, tetapi "
-                f"ditemukan {len(self.feature_names)}."
-            )
-
-    def status(self) -> ArtifactStatus:
-        target_ready = (
-            self.target_scaler is not None
-            and self.target_transformer is not None
-        )
-        feature_ready = (
-            self.onehot_encoder is not None
-            and self.feature_scaler is not None
-            and bool(self.feature_transformers)
-            and not self._preprocessor_error
+        c2.metric(
+            "Total estimasi GKG",
+            format_ton(frame["prediction_gkg_ton"].sum()),
         )
 
-        if self._preprocessor_error:
-            message = self._preprocessor_error
-        elif target_ready and feature_ready:
-            message = (
-                "Model, preprocessing fitur mentah, dan inverse target siap."
-            )
-        else:
-            message = "Artefak deployment belum lengkap."
-
-        return ArtifactStatus(
-            model_loaded=True,
-            preprocessor_found=self.preprocessor_path.exists(),
-            target_inverse_ready=target_ready,
-            feature_preprocessing_ready=feature_ready,
-            n_model_features=len(self.feature_names),
-            scenario_name=self.scenario_name,
-            dataset_mode=self.dataset_mode,
-            message=message,
-        )
-
-    @staticmethod
-    def _canonicalize_raw_columns(frame: pd.DataFrame) -> pd.DataFrame:
-        result = frame.copy()
-        aliases = {
-            "Kabupaten/kota": "kabupaten_kota",
-            "kabupaten/kota": "kabupaten_kota",
-            "kabupaten kota": "kabupaten_kota",
-        }
-        for old_name, new_name in aliases.items():
-            if old_name in result.columns and new_name not in result.columns:
-                result = result.rename(columns={old_name: new_name})
-        return result
-
-    def _validate_known_categories(self, raw: pd.DataFrame) -> None:
-        encoder_frame = raw.rename(
-            columns={"kabupaten_kota": "Kabupaten/kota"}
-        )
-        for col, known_values in zip(
-            self.categorical_cols,
-            self.onehot_encoder.categories_,
-            strict=True,
-        ):
-            actual_values = set(
-                encoder_frame[col].astype(str).str.strip().unique()
-            )
-            known = set(map(str, known_values))
-            unknown = sorted(actual_values.difference(known))
-            if unknown:
-                raise PredictorValidationError(
-                    f"Kategori tidak dikenal pada {col}: {unknown[:10]}."
-                )
-
-    def _apply_feature_capping(self, numeric: pd.DataFrame) -> pd.DataFrame:
-        result = numeric.copy()
-        if self.capping_bounds.empty:
-            return result
-
-        required_bound_columns = {
-            "kolom",
-            "lower_bound_train",
-            "upper_bound_train",
-        }
-        if not required_bound_columns.issubset(
-            self.capping_bounds.columns
-        ):
-            raise ArtifactNotReadyError(
-                "Format capping_bounds pada preprocessor tidak valid."
-            )
-
-        bounds = self.capping_bounds.set_index("kolom")
-        for col in self.yeojohnson_feature_cols:
-            if col not in bounds.index:
-                continue
-            lower = float(bounds.loc[col, "lower_bound_train"])
-            upper = float(bounds.loc[col, "upper_bound_train"])
-            result[col] = result[col].clip(lower=lower, upper=upper)
-        return result
-
-    def _transform_raw_predictors(
-        self,
-        frame: pd.DataFrame,
-    ) -> pd.DataFrame:
-        if self._preprocessor_error:
-            raise ArtifactNotReadyError(self._preprocessor_error)
-
-        raw = self._canonicalize_raw_columns(frame)
-        missing = [
-            col for col in RAW_REQUIRED_COLUMNS if col not in raw.columns
-        ]
-        if missing:
-            raise PredictorValidationError(
-                "Kolom prediktor mentah belum lengkap: "
-                + ", ".join(missing)
-            )
-
-        self._validate_known_categories(raw)
-
-        numeric = raw[self.numeric_cols].copy()
-        for col in self.numeric_cols:
-            numeric[col] = pd.to_numeric(numeric[col], errors="coerce")
-        if numeric.isna().any().any():
-            bad = numeric.columns[numeric.isna().any()].tolist()
-            raise PredictorValidationError(
-                "Nilai numerik kosong/tidak valid pada kolom: "
-                + ", ".join(bad)
-            )
-        if not np.isfinite(numeric.to_numpy(dtype=float)).all():
-            raise PredictorValidationError(
-                "Prediktor numerik mengandung infinity."
-            )
-
-        # Capping fitur mengikuti batas Train pada preprocessor v2.
-        # Target capping sudah diterapkan saat preprocessing/training;
-        # input website tidak memuat kolom target.
-        numeric = self._apply_feature_capping(numeric)
-
-        transformed_numeric = numeric.copy()
-        for col in self.yeojohnson_feature_cols:
-            transformer = self.feature_transformers.get(col)
-            if transformer is None:
-                raise ArtifactNotReadyError(
-                    f"PowerTransformer fitur tidak ditemukan untuk {col}."
-                )
-            transformed_numeric[col] = transformer.transform(
-                numeric[[col]].to_numpy(dtype=float)
-            ).reshape(-1)
-
-        scaled_values = self.feature_scaler.transform(
-            transformed_numeric[self.numeric_cols]
-        )
-        scaled_numeric = pd.DataFrame(
-            scaled_values,
-            columns=self.numeric_cols,
-            index=raw.index,
-        )
-
-        encoder_input = raw.rename(
-            columns={"kabupaten_kota": "Kabupaten/kota"}
-        )[self.categorical_cols].copy()
-        encoded_values = self.onehot_encoder.transform(encoder_input)
-        if hasattr(encoded_values, "toarray"):
-            encoded_values = encoded_values.toarray()
-        encoded_names = list(
-            self.onehot_encoder.get_feature_names_out(
-                self.categorical_cols
-            )
-        )
-        encoded = pd.DataFrame(
-            np.asarray(encoded_values, dtype=float),
-            columns=encoded_names,
-            index=raw.index,
-        )
-
-        model_input = pd.concat([scaled_numeric, encoded], axis=1)
-        model_input = model_input.rename(columns={"tahun": "tahun.1"})
-
-        missing_model = [
-            col for col in self.feature_names if col not in model_input.columns
-        ]
-        extra_model = [
-            col for col in model_input.columns if col not in self.feature_names
-        ]
-        if missing_model or extra_model:
-            raise ArtifactNotReadyError(
-                "Hasil preprocessing tidak cocok dengan model. "
-                f"Missing={missing_model[:10]}, extra={extra_model[:10]}."
-            )
-
-        return model_input[self.feature_names].astype(float)
-
-    def _prepare_model_ready(
-        self,
-        frame: pd.DataFrame,
-    ) -> pd.DataFrame:
-        # Tetap mendukung CSV 141 fitur model-ready untuk audit/developer.
-        if set(self.feature_names).issubset(frame.columns):
-            ready = frame[self.feature_names].apply(
-                pd.to_numeric, errors="coerce"
-            )
-            if ready.isna().any().any():
-                raise PredictorValidationError(
-                    "Input model-ready mengandung nilai kosong/non-numerik."
-                )
-            return ready.astype(float)
-
-        return self._transform_raw_predictors(frame)
-
-    def _inverse_target(self, predicted_y_model: np.ndarray) -> np.ndarray:
-        if (
-            self.target_scaler is None
-            or self.target_transformer is None
-        ):
-            raise ArtifactNotReadyError(
-                "target_scaler atau target_transformer tidak tersedia."
-            )
-
-        values = np.asarray(predicted_y_model, dtype=float).reshape(-1, 1)
-        after_minmax = self.target_scaler.inverse_transform(values)
-        production_ton = self.target_transformer.inverse_transform(
-            after_minmax
-        ).reshape(-1)
-        if not np.isfinite(production_ton).all():
-            raise ArtifactNotReadyError(
-                "Hasil inverse target mengandung NaN/infinity."
-            )
-
-        # Sama dengan program training:
-        # CLIP_NEGATIVE_PREDICTIONS_TO_ZERO = True.
-        return np.maximum(production_ton, 0.0)
-
-    def predict(self, frame: pd.DataFrame) -> pd.DataFrame:
-        raw = self._canonicalize_raw_columns(frame)
-        required_identity = {"tahun", "provinsi", "kabupaten_kota"}
-        missing_identity = required_identity.difference(raw.columns)
-        if missing_identity:
-            raise PredictorValidationError(
-                "Kolom identitas prediksi belum lengkap: "
-                + ", ".join(sorted(missing_identity))
-            )
-
-        model_input = self._prepare_model_ready(raw)
-        predicted_y_model = self.model.predict(model_input)
-        predicted_ton = self._inverse_target(predicted_y_model)
-
-        return pd.DataFrame(
-            {
-                "year": raw["tahun"].astype(int).to_numpy(),
-                "province": raw["provinsi"].astype(str).to_numpy(),
-                "city": raw["kabupaten_kota"].astype(str).to_numpy(),
-                "prediction_y_model": np.asarray(
-                    predicted_y_model, dtype=float
+        chart = px.bar(
+            frame.sort_values("prediction_rice_ton"),
+            x="prediction_rice_ton",
+            y="province",
+            orientation="h",
+            labels={
+                "prediction_rice_ton": (
+                    "Estimasi beras (ton)"
                 ),
-                "prediction_ton": predicted_ton,
+                "province": "Provinsi",
+            },
+            title=f"Estimasi Produksi Beras Provinsi Tahun {year}",
+        )
+        st.plotly_chart(chart, use_container_width=True)
+
+        table_columns = [
+            "province",
+            "prediction_rice_ton",
+            "prediction_gkg_ton",
+            "actual_rice_ton",
+            "actual_gkg_ton",
+            "conversion_percent",
+            "child_count",
+        ]
+        table = frame[table_columns].rename(
+            columns={
+                "province": "Provinsi",
+                "prediction_rice_ton": "Estimasi Beras (ton)",
+                "prediction_gkg_ton": "Estimasi GKG (ton)",
+                "actual_rice_ton": "Aktual Beras (ton)",
+                "actual_gkg_ton": "Aktual GKG (ton)",
+                "conversion_percent": (
+                    "Konversi GKG ke Beras (%)"
+                ),
+                "child_count": "Jumlah child",
             }
         )
+        st.dataframe(
+            table,
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "Estimasi Beras (ton)": st.column_config.NumberColumn(
+                    format="%.2f"
+                ),
+                "Estimasi GKG (ton)": st.column_config.NumberColumn(
+                    format="%.2f"
+                ),
+                "Aktual Beras (ton)": st.column_config.NumberColumn(
+                    format="%.2f"
+                ),
+                "Aktual GKG (ton)": st.column_config.NumberColumn(
+                    format="%.2f"
+                ),
+                "Konversi GKG ke Beras (%)": (
+                    st.column_config.NumberColumn(format="%.4f")
+                ),
+            },
+        )
+
+        with st.expander("Metode konversi GKG menjadi beras"):
+            st.write(
+                "Beras dihitung dari estimasi GKG menggunakan:"
+            )
+            st.latex(
+                r"\hat{Y}_{beras}="
+                r"\hat{Y}_{GKG}\times 0{,}6402"
+            )
+            st.write(
+                "Nilai k_p adalah rendemen GKG ke beras tingkat "
+                "provinsi hasil SKGB 2018."
+            )
+        return
+
+    cities = load_city_predictions(year, province)
+    province_frame = load_province_predictions(
+        year,
+        province,
+    )
+    if cities.empty or province_frame.empty:
+        st.info("Data wilayah belum tersedia.")
+        return
+
+    cities = add_rice_conversion_columns(cities)
+    province_frame = add_rice_conversion_columns(province_frame)
+
+    province_row = province_frame.iloc[0]
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric(
+        f"Estimasi beras {province}",
+        format_ton(province_row["prediction_rice_ton"]),
+    )
+    c2.metric(
+        "Estimasi GKG",
+        format_ton(province_row["prediction_gkg_ton"]),
+    )
+    c3.metric(
+        "Kabupaten/kota teragregasi",
+        int(province_row["child_count"]),
+    )
+    c4.metric(
+        "Selisih koherensi beras",
+        format_ton(
+            province_row["coherence_difference_rice_ton"]
+        ),
+    )
+
+    st.caption(
+        "Faktor total konversi GKG menjadi beras untuk konsumsi "
+        f"pangan penduduk di {province}: "
+        f"{province_row['conversion_percent']:.4f}%."
+    )
+
+    trend = load_province_predictions(None, province)
+    if not trend.empty and trend["year"].nunique() > 1:
+        trend = add_rice_conversion_columns(trend)
+        line = px.line(
+            trend.sort_values("year"),
+            x="year",
+            y="prediction_rice_ton",
+            markers=True,
+            labels={
+                "year": "Tahun",
+                "prediction_rice_ton": (
+                    "Produksi beras (ton)"
+                ),
+            },
+            title=f"Tren Estimasi Beras Provinsi {province}",
+        )
+        st.plotly_chart(line, use_container_width=True)
+
+    bar = px.bar(
+        cities.sort_values("prediction_rice_ton"),
+        x="prediction_rice_ton",
+        y="city",
+        orientation="h",
+        height=max(500, 28 * len(cities)),
+        labels={
+            "prediction_rice_ton": (
+                "Estimasi beras (ton)"
+            ),
+            "city": "Kabupaten/Kota",
+        },
+        title=f"Rincian Estimasi Beras Kabupaten/Kota Tahun {year}",
+    )
+    st.plotly_chart(bar, use_container_width=True)
+
+    city_table = (
+        cities[
+            [
+                "city",
+                "prediction_rice_ton",
+                "prediction_gkg_ton",
+                "actual_rice_ton",
+                "actual_gkg_ton",
+                "source",
+            ]
+        ]
+        .rename(
+            columns={
+                "city": "Kabupaten/Kota",
+                "prediction_rice_ton": "Estimasi Beras (ton)",
+                "prediction_gkg_ton": "Estimasi GKG (ton)",
+                "actual_rice_ton": "Aktual Beras (ton)",
+                "actual_gkg_ton": "Aktual GKG (ton)",
+                "source": "Sumber",
+            }
+        )
+        .sort_values("Estimasi Beras (ton)", ascending=False)
+    )
+    st.dataframe(
+        city_table,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "Estimasi Beras (ton)": st.column_config.NumberColumn(
+                format="%.2f"
+            ),
+            "Estimasi GKG (ton)": st.column_config.NumberColumn(
+                format="%.2f"
+            ),
+            "Aktual Beras (ton)": st.column_config.NumberColumn(
+                format="%.2f"
+            ),
+            "Aktual GKG (ton)": st.column_config.NumberColumn(
+                format="%.2f"
+            ),
+        },
+    )
+
+
+def login_form() -> None:
+    st.subheader("Login admin")
+    email = st.text_input("Email")
+    password = st.text_input("Kata sandi", type="password")
+    if st.button("Masuk", type="primary"):
+        try:
+            store = public_store()
+            session = store.sign_in(email, password)
+            authed = SupabaseStore(
+                SUPABASE_URL,
+                SUPABASE_KEY,
+                session.access_token,
+                session.refresh_token,
+            )
+            profile = authed.assert_admin(session.user_id)
+            st.session_state.update(
+                {
+                    "user_id": session.user_id,
+                    "user_email": session.email,
+                    "access_token": session.access_token,
+                    "refresh_token": session.refresh_token,
+                    "profile": profile,
+                }
+            )
+            st.rerun()
+        except Exception as exc:
+            st.error(f"Login gagal: {exc}")
+
+
+def seed_historical(
+    store: SupabaseStore,
+) -> None:
+    """Masukkan hasil historis hanya sampai 2024."""
+    seed_path = DATA_DIR / "seed_predictions_2022_2025.csv"
+    frame = pd.read_csv(seed_path)
+
+    if "year" not in frame.columns:
+        raise ValueError("File seed tidak memiliki kolom 'year'.")
+
+    frame["year"] = pd.to_numeric(
+        frame["year"],
+        errors="raise",
+    ).astype(int)
+    frame = frame.loc[
+        frame["year"] <= HISTORICAL_SEED_END_YEAR
+    ].copy()
+
+    if frame.empty:
+        raise ValueError(
+            "Tidak ada data seed historis sampai tahun "
+            f"{HISTORICAL_SEED_END_YEAR}."
+        )
+
+    city = frame[
+        [
+            "year",
+            "province",
+            "city",
+            "prediction_ton",
+            "actual_ton",
+        ]
+    ].copy()
+    province = aggregate_provinces(city)
+    store.upsert_predictions(
+        batch_id=None,
+        city_frame=city,
+        province_frame=province,
+        source=(
+            "hasil_model_2022_"
+            f"{HISTORICAL_SEED_END_YEAR}"
+        ),
+    )
+    clear_prediction_cache()
+
+
+def admin_page() -> None:
+    st.title("🔐 Admin data prediktor")
+
+    if "access_token" not in st.session_state:
+        login_form()
+        return
+
+    try:
+        store = authenticated_store()
+        store.assert_admin(st.session_state["user_id"])
+    except Exception as exc:
+        st.session_state.clear()
+        st.error(f"Sesi admin tidak valid: {exc}")
+        return
+
+    top_left, top_right = st.columns([4, 1])
+    top_left.success(
+        "Login sebagai "
+        + str(st.session_state.get("user_email", "admin"))
+    )
+    if top_right.button("Keluar"):
+        try:
+            store.sign_out()
+        finally:
+            st.session_state.clear()
+            st.rerun()
+
+    try:
+        runtime, artifact_source = load_runtime(
+            HF_REPO_ID,
+            HF_REVISION,
+            HF_TOKEN,
+        )
+        status = runtime.status()
+        st.caption(f"Artefak: {artifact_source}")
+        if not (
+            status.target_inverse_ready
+            and status.feature_preprocessing_ready
+        ):
+            st.error(status.message)
+            return
+    except Exception as exc:
+        st.error(f"Model belum siap: {exc}")
+        return
+
+    regions = load_regions()
+    if regions.empty:
+        st.error("Tabel regions kosong.")
+        return
+
+    with st.expander("Status model dan hierarki"):
+        st.json(status.to_dict())
+        st.write(
+            "Jumlah wilayah wajib:",
+            regions.groupby("province")["city"]
+            .nunique()
+            .to_dict(),
+        )
+
+    if st.button(
+        f"Masukkan hasil historis 2022–{HISTORICAL_SEED_END_YEAR}"
+    ):
+        try:
+            seed_historical(store)
+            st.success(
+                "Data historis 2022–"
+                f"{HISTORICAL_SEED_END_YEAR} berhasil disimpan. "
+                "Tahun 2025 tidak dimasukkan sebagai seed."
+            )
+        except Exception as exc:
+            st.error(f"Seed gagal: {exc}")
+
+    year = st.number_input(
+        "Tahun estimasi",
+        min_value=MIN_PREDICTION_YEAR,
+        max_value=MAX_PREDICTION_YEAR,
+        value=DEFAULT_PREDICTION_YEAR,
+        step=1,
+        help=(
+            "Same-year regression: data prediktor tahun yang dipilih "
+            "digunakan untuk mengestimasi produksi pada tahun yang sama."
+        ),
+    )
+    st.caption(
+        f"Data prediktor {int(year)} digunakan untuk mengestimasi GKG "
+        f"tahun {int(year)}. Hasil GKG kemudian dikonversi menjadi "
+        "beras untuk konsumsi pangan penduduk."
+    )
+
+    template = pd.read_csv(
+        DATA_DIR / "predictor_template_2026.csv"
+    )
+    template["tahun"] = int(year)
+    st.download_button(
+        "Unduh template 119 wilayah",
+        data=template.to_csv(index=False).encode("utf-8-sig"),
+        file_name=f"template_prediktor_{int(year)}.csv",
+        mime="text/csv",
+    )
+
+    uploaded = st.file_uploader(
+        "Unggah CSV prediktor",
+        type=["csv"],
+    )
+    if uploaded is None:
+        return
+
+    try:
+        frame = pd.read_csv(uploaded)
+        st.caption(f"Jumlah baris: {len(frame)}")
+        st.dataframe(
+            frame.head(20),
+            use_container_width=True,
+            hide_index=True,
+        )
+        validated = validate_admin_frame(
+            frame,
+            runtime,
+            regions,
+        )
+
+        csv_years = sorted(
+            pd.to_numeric(
+                validated["tahun"],
+                errors="raise",
+            )
+            .astype(int)
+            .unique()
+            .tolist()
+        )
+        selected_year = int(year)
+
+        if csv_years != [selected_year]:
+            raise ValueError(
+                "Tahun pada CSV harus sama dengan tahun estimasi yang "
+                f"dipilih. Pilihan admin={selected_year}, "
+                f"tahun dalam CSV={csv_years}."
+            )
+
+        st.success(
+            "Validasi awal berhasil: 119 wilayah lengkap dan seluruh "
+            f"baris menggunakan prediktor tahun {selected_year}."
+        )
+    except Exception as exc:
+        st.error(f"CSV belum valid: {exc}")
+        return
+
+    if st.button(
+        "Simpan prediktor dan jalankan estimasi",
+        type="primary",
+    ):
+        batch_id = None
+        try:
+            batch_id = store.create_batch(
+                year=int(validated["tahun"].iloc[0]),
+                user_id=st.session_state["user_id"],
+                filename=uploaded.name,
+                row_count=len(validated),
+            )
+            store.store_predictors(batch_id, validated)
+            store.update_batch(batch_id, "processing")
+
+            city_predictions = runtime.predict(validated)
+            province_predictions = aggregate_provinces(
+                city_predictions
+            )
+
+            expected = (
+                regions.groupby("province")["city"]
+                .nunique()
+                .to_dict()
+            )
+            actual = dict(
+                zip(
+                    province_predictions["province"],
+                    province_predictions["child_count"],
+                )
+            )
+            if actual != expected:
+                raise HierarchyValidationError(
+                    "Jumlah child hasil estimasi tidak sesuai: "
+                    f"{actual}; wajib={expected}."
+                )
+
+            store.upsert_predictions(
+                batch_id=batch_id,
+                city_frame=city_predictions,
+                province_frame=province_predictions,
+                source="model",
+            )
+            store.update_batch(batch_id, "completed")
+            clear_prediction_cache()
+
+            prediction_year = int(
+                validated["tahun"].iloc[0]
+            )
+            st.success(
+                f"Estimasi produksi tahun {prediction_year} untuk "
+                "119 kabupaten/kota dan agregasi Bottom-Up menjadi "
+                "enam provinsi berhasil."
+            )
+            province_display = add_rice_conversion_columns(
+                province_predictions
+            )
+            st.dataframe(
+                province_display[
+                    [
+                        "province",
+                        "prediction_rice_ton",
+                        "prediction_gkg_ton",
+                        "conversion_percent",
+                        "child_count",
+                    ]
+                ].rename(
+                    columns={
+                        "province": "Provinsi",
+                        "prediction_rice_ton": "Estimasi Beras (ton)",
+                        "prediction_gkg_ton": "Estimasi GKG (ton)",
+                        "conversion_percent": (
+                            "Konversi GKG ke Beras (%)"
+                        ),
+                        "child_count": "Jumlah child",
+                    }
+                ),
+                use_container_width=True,
+                hide_index=True,
+            )
+        except (
+            ValueError,
+            PredictorValidationError,
+            ArtifactNotReadyError,
+            HierarchyValidationError,
+        ) as exc:
+            if batch_id:
+                store.update_batch(batch_id, "failed", str(exc))
+            st.error(f"Estimasi gagal: {exc}")
+        except Exception as exc:
+            if batch_id:
+                store.update_batch(batch_id, "failed", str(exc))
+            st.error(f"Kesalahan sistem: {exc}")
+
+
+page = st.sidebar.radio(
+    "Navigasi",
+    ["Dashboard", "Admin"],
+)
+st.sidebar.caption(
+    "Hierarki: kabupaten/kota → provinsi"
+)
+st.sidebar.caption(
+    "Metode final: Bottom-Up"
+)
+st.sidebar.caption(
+    "Output model: GKG → beras (× 64,02%)"
+)
+
+try:
+    if page == "Dashboard":
+        dashboard_page()
+    else:
+        admin_page()
+except Exception as exc:
+    st.error(f"Aplikasi mengalami kesalahan: {exc}")
