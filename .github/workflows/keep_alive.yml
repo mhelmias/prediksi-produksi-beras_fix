@@ -1,0 +1,27 @@
+name: Keep Streamlit Alive
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"   # tiap 6 jam (waktu UTC)
+  workflow_dispatch:         # bisa dijalankan manual dari tab Actions
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Playwright
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
+      - name: Buka dashboard
+        run: python keep_alive.py
+        env:
+          APP_URL: "https://estimasi-beras.streamlit.app/"
